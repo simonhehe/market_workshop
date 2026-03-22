@@ -1,0 +1,10 @@
+// 导出所有API
+export { default as api } from './index'
+export { authApi } from './auth'
+export { userApi } from './user'
+export { productApi } from './product'
+export { cartApi } from './cart'
+export { orderApi } from './order'
+export { addressApi } from './address'
+export { favoriteApi } from './favorite'
+export { categoryApi } from './category'

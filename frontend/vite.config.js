@@ -6,6 +6,11 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    open: false,
+    strictPort: false,
+    headers: {
+      // Remove CSP header in dev mode to allow Vite HMR
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
@@ -18,5 +23,17 @@ export default defineConfig({
     alias: {
       '@': '/src'
     }
+  },
+  build: {
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
+  },
+  preview: {
+    port: 3000,
+    host: true
   }
 })

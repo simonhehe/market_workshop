@@ -11,10 +11,26 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/health")
 public class HealthController {
     
-    @GetMapping
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> root() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("service", "mall-backend");
+        data.put("version", "1.0.0");
+        data.put("status", "running");
+        data.put("timestamp", LocalDateTime.now());
+        data.put("endpoints", Map.of(
+            "health", "/api/health",
+            "auth", "/api/auth/login",
+            "products", "/api/products",
+            "categories", "/api/categories"
+        ));
+        
+        return ResponseEntity.ok(ApiResponse.success("商城后端API服务", data));
+    }
+    
+    @GetMapping("/health")
     public ResponseEntity<ApiResponse<Map<String, Object>>> health() {
         Map<String, Object> data = new HashMap<>();
         data.put("status", "healthy");
