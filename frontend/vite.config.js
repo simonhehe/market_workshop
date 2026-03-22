@@ -1,6 +1,15 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+/** 与 dev 共用：否则 `vite preview` / `npm run preview` 不会转发 /api，PUT 等会 404 */
+const apiProxy = {
+  '/api': {
+    target: 'http://localhost:8080',
+    changeOrigin: true,
+    rewrite: (path) => path
+  }
+}
+
 export default defineConfig({
   plugins: [vue()],
   server: {
@@ -11,13 +20,7 @@ export default defineConfig({
     headers: {
       // Remove CSP header in dev mode to allow Vite HMR
     },
-    proxy: {
-      '/api': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path
-      }
-    }
+    proxy: apiProxy
   },
   resolve: {
     alias: {
@@ -34,6 +37,7 @@ export default defineConfig({
   },
   preview: {
     port: 3000,
-    host: true
+    host: true,
+    proxy: apiProxy
   }
 })

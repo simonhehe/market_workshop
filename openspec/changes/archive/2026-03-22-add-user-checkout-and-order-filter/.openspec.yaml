@@ -1,0 +1,6 @@
+# OpenSpec change metadata (minimal hand-written scaffold)
+# If using OpenSpec CLI, this file may be regenerated.
+name: add-user-checkout-and-order-filter
+title: 用户结算下单与订单状态筛选
+status: proposed
+created: N/A

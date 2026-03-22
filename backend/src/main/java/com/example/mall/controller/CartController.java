@@ -54,13 +54,48 @@ public class CartController {
         }
     }
     
+    /**
+     * 更新勾选状态（推荐使用）：固定路径 POST /cart/selection，避免部分代理/环境对 PUT /cart/{id}/selection 返回 404。
+     * body: { "cartItemId": long, "isSelected": 0|1 }
+     */
+    @PostMapping("/selection")
+    public ResponseEntity<ApiResponse<Cart>> updateSelectionPost(
+            @RequestAttribute("userId") Long userId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            Long id = Long.valueOf(request.get("cartItemId").toString());
+            int isSelected = Integer.parseInt(request.get("isSelected").toString());
+            Cart cart = cartService.updateSelection(id, userId, isSelected);
+            return ResponseEntity.ok(ApiResponse.success("购物车选中状态已更新", cart));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("CART_001", e.getMessage()));
+        }
+    }
+    
+    @PutMapping("/{id}/selection")
+    public ResponseEntity<ApiResponse<Cart>> updateSelection(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            int isSelected = Integer.parseInt(request.get("isSelected").toString());
+            Cart cart = cartService.updateSelection(id, userId, isSelected);
+            return ResponseEntity.ok(ApiResponse.success("购物车选中状态已更新", cart));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("CART_001", e.getMessage()));
+        }
+    }
+    
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Cart>> updateQuantity(
             @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
             @RequestBody Map<String, Object> request) {
         try {
             Integer quantity = Integer.valueOf(request.get("quantity").toString());
-            Cart cart = cartService.updateQuantity(id, quantity);
+            Cart cart = cartService.updateQuantity(id, userId, quantity);
             
             if (cart == null) {
                 return ResponseEntity.ok(ApiResponse.success("商品已从购物车移除", null));
@@ -74,9 +109,11 @@ public class CartController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> removeFromCart(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> removeFromCart(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId) {
         try {
-            cartService.removeFromCart(id);
+            cartService.removeFromCart(id, userId);
             return ResponseEntity.ok(ApiResponse.success("购物车商品删除成功", null));
         } catch (Exception e) {
             return ResponseEntity.badRequest()

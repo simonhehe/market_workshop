@@ -6,10 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -77,6 +75,9 @@ public class OrderService {
         if (addressId != null) {
             address = addressRepository.findById(addressId)
                     .orElseThrow(() -> new RuntimeException("收货地址不存在"));
+            if (!address.getUserId().equals(userId)) {
+                throw new RuntimeException("无权使用该收货地址");
+            }
         }
         
         // 创建订单
@@ -134,8 +135,14 @@ public class OrderService {
         return order;
     }
     
-    public List<Order> getUserOrders(Long userId) {
-        return orderRepository.findByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId);
+    /**
+     * @param status 可选：null、空、all 表示全部；否则按状态筛选（与 Order.status 一致）
+     */
+    public List<Order> getUserOrders(Long userId, String status) {
+        if (status == null || status.isBlank() || "all".equalsIgnoreCase(status.trim())) {
+            return orderRepository.findByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(userId);
+        }
+        return orderRepository.findOrders(userId, status.trim());
     }
     
     public Optional<Order> getOrderById(Long orderId) {
@@ -184,6 +191,26 @@ public class OrderService {
         }
         
         order.setStatus("cancelled");
+        return orderRepository.save(order);
+    }
+
+    /**
+     * 用户确认收货：仅允许 {@code shipped} → {@code completed}。
+     */
+    @Transactional
+    public Order confirmReceipt(Long orderId, Long userId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("订单不存在"));
+
+        if (!order.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此订单");
+        }
+
+        if (!"shipped".equals(order.getStatus())) {
+            throw new RuntimeException("只有已发货的订单可以确认收货");
+        }
+
+        order.setStatus("completed");
         return orderRepository.save(order);
     }
 }

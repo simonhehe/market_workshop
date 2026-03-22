@@ -50,9 +50,12 @@ public class CartService {
     }
     
     @Transactional
-    public Cart updateQuantity(Long cartId, Integer quantity) {
+    public Cart updateQuantity(Long cartId, Long userId, Integer quantity) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此购物车项");
+        }
         
         if (quantity <= 0) {
             cartRepository.delete(cart);
@@ -64,8 +67,27 @@ public class CartService {
     }
     
     @Transactional
-    public void removeFromCart(Long cartId) {
-        cartRepository.deleteById(cartId);
+    public void removeFromCart(Long cartId, Long userId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此购物车项");
+        }
+        cartRepository.delete(cart);
+    }
+    
+    @Transactional
+    public Cart updateSelection(Long cartId, Long userId, int isSelected) {
+        if (isSelected != 0 && isSelected != 1) {
+            throw new RuntimeException("isSelected 必须为 0 或 1");
+        }
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此购物车项");
+        }
+        cart.setIsSelected(isSelected);
+        return cartRepository.save(cart);
     }
     
     @Transactional
@@ -78,14 +100,14 @@ public class CartService {
         
         int totalCount = cartItems.size();
         int selectedCount = (int) cartItems.stream()
-                .filter(item -> item.getIsSelected() == 1)
+                .filter(this::rowSelected)
                 .count();
         
         int totalPoints = 0;
         int totalQuantity = 0;
         
         for (Cart item : cartItems) {
-            if (item.getIsSelected() == 1) {
+            if (rowSelected(item)) {
                 Product product = productRepository.findById(item.getProductId()).orElse(null);
                 if (product != null) {
                     totalPoints += product.getPointsRequired() * item.getQuantity();
@@ -101,5 +123,11 @@ public class CartService {
         summary.put("totalQuantity", totalQuantity);
         
         return summary;
+    }
+
+    /** 避免 is_selected 为 null 时 Integer==int 拆箱 NPE，并与 0/1 语义一致 */
+    private boolean rowSelected(Cart item) {
+        Integer s = item.getIsSelected();
+        return s != null && s == 1;
     }
 }

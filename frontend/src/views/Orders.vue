@@ -2,6 +2,18 @@
   <Layout>
     <div class="orders-page">
       <h2>我的订单</h2>
+
+      <div class="filter-row">
+        <label for="order-status-filter">状态筛选</label>
+        <select id="order-status-filter" v-model="filterStatus" class="status-filter" @change="loadOrders">
+          <option value="all">全部</option>
+          <option value="pending">待处理</option>
+          <option value="processing">处理中</option>
+          <option value="shipped">已发货</option>
+          <option value="completed">已完成</option>
+          <option value="cancelled">已取消</option>
+        </select>
+      </div>
       
       <div v-if="orders.length === 0" class="empty">
         暂无订单
@@ -44,7 +56,8 @@ export default {
   components: { Layout },
   data() {
     return {
-      orders: []
+      orders: [],
+      filterStatus: 'all'
     }
   },
   async mounted() {
@@ -53,9 +66,11 @@ export default {
   methods: {
     async loadOrders() {
       try {
-        const response = await orderApi.getOrders()
+        const params =
+          this.filterStatus === 'all' ? {} : { status: this.filterStatus }
+        const response = await orderApi.getOrders(params)
         if (response.success) {
-          this.orders = response.data
+          this.orders = response.data || []
         }
       } catch (err) {
         console.error('加载订单失败', err)
@@ -113,6 +128,25 @@ export default {
 .orders-page h2 {
   font-size: 24px;
   margin-bottom: 24px;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filter-row label {
+  font-size: 14px;
+  color: #666;
+}
+
+.status-filter {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  min-width: 160px;
 }
 
 .empty {

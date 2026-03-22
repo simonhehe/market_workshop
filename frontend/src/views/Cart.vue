@@ -12,8 +12,8 @@
           <div v-for="item in cartItems" :key="item.id" class="cart-item">
             <input 
               type="checkbox" 
-              :checked="item.isSelected === 1"
-              @change="toggleSelect(item)"
+              :checked="isRowSelected(item)"
+              @change="toggleSelect(item, $event)"
             />
             <div class="item-info">
               <h4>{{ getProductName(item.productId) }}</h4>
@@ -92,9 +92,22 @@ export default {
     getProductPoints(productId) {
       return this.products[productId]?.pointsRequired || 0
     },
-    async toggleSelect(item) {
-      // 这里需要后端支持，暂时跳过
-      await this.loadCart()
+    /** 兼容 number / string / boolean，避免 === 1 导致无法取消勾选、总计不更新 */
+    isRowSelected(item) {
+      const v = item?.isSelected
+      return v === 1 || v === true || v === '1'
+    },
+    async toggleSelect(item, event) {
+      const desired = event.target.checked ? 1 : 0
+      try {
+        const response = await cartApi.updateSelection(item.id, desired)
+        if (response && response.success) {
+          await this.loadCart()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '更新选中状态失败')
+        await this.loadCart()
+      }
     },
     async updateQuantity(id, quantity) {
       if (quantity < 1) {
@@ -122,7 +135,11 @@ export default {
       }
     },
     checkout() {
-      this.$router.push('/orders/create')
+      if (!this.summary.selectedCount || this.summary.selectedCount < 1) {
+        alert('请选择要结算的商品')
+        return
+      }
+      this.$router.push('/checkout')
     }
   }
 }

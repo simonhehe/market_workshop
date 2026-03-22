@@ -44,9 +44,10 @@ public class OrderController {
     
     @GetMapping
     public ResponseEntity<ApiResponse<List<Order>>> getUserOrders(
-            @RequestAttribute("userId") Long userId) {
+            @RequestAttribute("userId") Long userId,
+            @RequestParam(required = false) String status) {
         try {
-            List<Order> orders = orderService.getUserOrders(userId);
+            List<Order> orders = orderService.getUserOrders(userId, status);
             return ResponseEntity.ok(ApiResponse.success("获取订单列表成功", orders));
         } catch (Exception e) {
             return ResponseEntity.badRequest()

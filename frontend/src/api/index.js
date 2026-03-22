@@ -1,7 +1,19 @@
 import axios from 'axios'
 
+/**
+ * 必须使用「相对站点根」的绝对地址，避免在 /cart、/orders/1 等嵌套路由下，
+ * 个别环境下把 baseURL `/api` 解析成「相对当前路径」→ 实际请求变成 /cart/api/...，
+ * 无法命中 Vite 的 proxy(`/api`)，从而 404。
+ */
+function resolveApiBaseURL() {
+  if (typeof window === 'undefined' || !window.location) {
+    return '/api'
+  }
+  return new URL('/api', window.location.origin).href
+}
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: resolveApiBaseURL(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'

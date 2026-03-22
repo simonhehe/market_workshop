@@ -1,0 +1,96 @@
+# OpenSpec context draft — generated from repository-visible facts only.
+# Uncertain items use N/A. Adjust keys to match your OpenSpec schema if different.
+
+domain:
+  name: "企业内部福利商城"
+  description: "后端 POM 描述为「企业内部福利商城后端服务」；业务形态为积分兑换商品、购物车与订单、用户/管理员角色（见代码与 DataInitializer）。"
+  primary_value: "N/A"
+
+tech_stack:
+  backend:
+    language: "Java 17"
+    framework: "Spring Boot 3.2.0"
+    build: "Maven"
+    persistence: "Spring Data JPA"
+    database_driver: "SQLite JDBC 3.44.1.0"
+    dialect: "Hibernate community SQLite dialect (hibernate-community-dialects)"
+    security_crypto: "spring-security-crypto (BCrypt PasswordEncoder)"
+    jwt: "jjwt 0.12.3 (api, impl, jackson runtime)"
+    other: "Lombok, spring-boot-starter-validation, spring-boot-starter-web"
+  frontend:
+    framework: "Vue 3"
+    bundler: "Vite 5"
+    router: "Vue Router 4"
+    http_client: "Axios 1.x"
+  tooling:
+    openspec_cli_node: ">=20.19 (per openspec/README.md; independent of frontend Node version)"
+
+architecture:
+  style: "前后端分离单体仓库（backend + frontend）"
+  api:
+    base_path: "/api"
+    backend_listen: "http://localhost:8080 (server.port in application.yml)"
+    frontend_dev: "http://localhost:3000 (vite.config.js)"
+    proxy: "Vite dev server proxies path /api to http://localhost:8080"
+  backend_layout: "com.example.mall — controller, service, repository, entity, config, middleware, util, common"
+  frontend_layout: "src: views, components, api, router — N/A 是否采用 Pinia/组合式 API细节"
+  deployment: "N/A"
+
+auth:
+  mechanism: "JWT in Authorization: Bearer <token>"
+  filter: "AuthMiddleware (OncePerRequestFilter), registered on /* via FilterConfig"
+  context_path_strip: "Strips /api prefix before path matching"
+  excluded_paths:
+    - "/"
+    - "/health"
+    - "/auth/login"
+    - "/products"
+    - "/categories"
+  excluded_paths_note: "Matcher uses equals or startsWith(excluded + \"/\") — subpaths of /products and /categories are excluded"
+  request_attributes: "userId, username, role (after successful JWT validation)"
+  password_storage: "DataInitializer uses plaintext for demo users user1–3; admin password BCrypt-encoded"
+  logout: "POST /auth/logout returns success; client discards token (comment in AuthController)"
+
+database:
+  engine: "SQLite"
+  url: "jdbc:sqlite:./database/mall.db (relative to backend working directory)"
+  ddl_mode: "spring.jpa.hibernate.ddl-auto: update"
+  migrations: "N/A (no Flyway/Liquibase in pom.xml)"
+
+core_entities:
+  - "User"
+  - "Product"
+  - "Category"
+  - "Cart"
+  - "Order"
+  - "OrderItem"
+  - "Address"
+  - "Favorite"
+  - "PointsHistory"
+
+core_flows:
+  public_no_jwt:
+    - "GET /health, GET / (root info in HealthController)"
+    - "GET /categories, GET /products (and GET /products/{id} under same prefix rule)"
+    - "POST /auth/login"
+  authenticated_user:
+    - "CRUD-style: addresses, cart, favorites, orders (create, list, detail, cancel pending), user profile APIs as implemented"
+  admin_role:
+    - "Paths under /admin/* with role == admin in controller checks — products, orders, users, categories management"
+  data_init:
+    - "DataInitializer (CommandLineRunner) seeds users/categories/products when respective tables empty"
+
+quality_risks:
+  automated_tests: "白盒 JUnit 位于 test/backend/java（backend/pom.xml 配置 testSourceDirectory）；冒烟 test/smoke/；白盒矩阵见 openspec/changes/add-user-checkout-and-order-filter/whitebox-matrix.md"
+  secrets: "jwt.secret 与 expiration 明文写在 application.yml"
+  auth_model_complexity: "JWT 白名单放行 /products、/categories 全前缀；与「仅登录可访问」的前端路由策略不完全一致（见 doc/项目初始化摘要.md 类描述）"
+  order_domain: "订单域基线见 doc/order-domain-baseline.md；本变更白盒矩阵见 openspec/changes/add-user-checkout-and-order-filter/whitebox-matrix.md"
+  spec_layer: "spec/Me2AI 与 spec/AI2AI 在当前工作区未检出文件 — N/A 是否在其他分支"
+
+# 执行本变更时：优先阅读 openspec/changes/add-user-checkout-and-order-filter/ 下 proposal、design、tasks、whitebox-matrix
+changes:
+  add_user_checkout_and_order_filter:
+    id: "add-user-checkout-and-order-filter"
+    path: "openspec/changes/add-user-checkout-and-order-filter"
+    testing_whitebox: "openspec/changes/add-user-checkout-and-order-filter/whitebox-matrix.md"
+    tasks: "openspec/changes/add-user-checkout-and-order-filter/tasks.md"

@@ -4,6 +4,7 @@ import Home from '../views/Home.vue'
 import Products from '../views/Products.vue'
 import ProductDetail from '../views/ProductDetail.vue'
 import Cart from '../views/Cart.vue'
+import Checkout from '../views/Checkout.vue'
 import Orders from '../views/Orders.vue'
 import OrderDetail from '../views/OrderDetail.vue'
 import Profile from '../views/Profile.vue'
@@ -41,6 +42,12 @@ const routes = [
     path: '/cart',
     name: 'Cart',
     component: Cart,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/checkout',
+    name: 'Checkout',
+    component: Checkout,
     meta: { requiresAuth: true }
   },
   {
