@@ -12,6 +12,9 @@ import java.util.Optional;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByUserIdAndDeletedAtIsNullOrderByCreatedAtDesc(Long userId);
+
+    List<Order> findByUserIdAndStatusAndDeletedAtIsNullOrderByCreatedAtDesc(Long userId, String status);
+
     Optional<Order> findByOrderNoAndDeletedAtIsNull(String orderNo);
     List<Order> findByStatusAndDeletedAtIsNull(String status);
     

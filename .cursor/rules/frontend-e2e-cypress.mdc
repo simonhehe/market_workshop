@@ -1,0 +1,25 @@
+---
+description: 本仓库前端 Cypress：配置位置、baseUrl、预览端口与无后端冒烟（stub）。
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# 前端 E2E（Cypress，本仓库）
+
+事实来源以 **`frontend/package.json`**、**`frontend/vite.config.js`**、**`frontend/cypress.config.cjs`**、**`frontend/cypress/e2e/*.cy.js`** 为准。
+
+## 配置约定
+
+- **配置文件**：使用 **`cypress.config.cjs`**（CommonJS），避免根目录 **`"type": "module"`** 与 Cypress 默认 CJS 加载冲突。
+- **baseUrl**：与 Vite **`preview.port: 3000`** 对齐（见 **`vite.config.js`**）；**`npm run dev`** 默认也为 3000。CI 里 preview 使用 **`--host 127.0.0.1 --port 3000`** 时，`wait-on` 与 `baseUrl` 必须一致。
+- **脚本**：`npm run cy:open`、`npm run cy:run`（见 **`package.json`**）。
+
+## 冒烟策略（当前仓库）
+
+- **最小冒烟**可对 **`/auth/login`、`/user/info`、`/categories`、`/products`、`/orders`** 等使用 **`cy.intercept`** 返回固定 JSON，从而在**无后端**或预览未代理后端时仍能验证「登录 → 跳转 → 订单列表」路由与关键文案。
+- 若改为**全真实后端**联调，须在技能或 `doc/analysis` 中写明前置条件（后端端口、初始数据），避免在文档中声称已跑通而实际未执行。
+
+## 二进制与 CI
+
+- 本机需 **`npx cypress install`** 或首次 **`npm install`** 拉取 Cypress 二进制；失败时属**环境问题**，不要在无依据时改写用例断言「绿」。
+- CI 见 **`.github/workflows/ci.yml`** 中 **`frontend-cypress`** job；以仓库内 workflow 为准，不臆测 Runner 缓存路径。

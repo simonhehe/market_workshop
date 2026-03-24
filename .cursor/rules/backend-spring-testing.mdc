@@ -1,0 +1,30 @@
+---
+description: 本仓库后端 Spring Boot 测试：MockMvc 与 context-path、集成测试数据源、YAML 与 JaCoCo。
+globs: backend/**/*
+alwaysApply: false
+---
+
+# 后端 Spring 测试（本仓库）
+
+事实来源以 **`backend/pom.xml`**、**`backend/src/main/resources/application.yml`**（`server.servlet.context-path: /api`）、**`backend/src/test/resources/application-test.yml`** 为准。
+
+## MockMvc 与 `/api` 前缀
+
+- **`@WebMvcTest` / 控制器单测**：按现有用例习惯构造路径（仓库内多数为**不带** context-path 的 servlet 路径，与 `TestDispatcherServlet` 映射一致）。
+- **`@SpringBootTest` + `@AutoConfigureMockMvc`（全容器 + 真实 Filter）**：`MockMvcRequestBuilders` 应使用 **应用内 servlet 映射路径**（如 **`/orders`**、`/admin/orders`**），**不要**再拼 **`/api/orders`**；否则 Dispatcher 映射对不上，易出现 **404**；Filter 仍会在完整请求语义下执行（与是否带 token 的分支有关）。
+- 若线上或文档写 **`/api/...`**：对外 URL = `context-path` + 控制器 `RequestMapping`，与 MockMvc 里使用的相对路径不是同一字符串，**不要混用**。
+
+## 集成测试数据源（SQLite vs H2）
+
+- **生产/本地默认**：`application.yml` 为 **SQLite** 文件库 + `ddl-auto: update`。
+- **全容器测试 profile**（见 **`application-test.yml`**）：使用 **H2 内存库** + `ddl-auto: create-drop`。原因：Hibernate 对 SQLite 生成/追加的部分 DDL（如某些 **`alter table ... add constraint ... unique`**）在 SQLite 上可能失败；H2 更适合「一次性建表」的集成测试。
+- **YAML**：SQLite 内存 URL 必须加引号，例如 **`url: "jdbc:sqlite::memory:"`**，否则 `:` 会被 YAML 误解析。
+- H2 JDBC URL 中 **`MODE=SQLite`** 等模式名需与本机 H2 版本匹配；不必要时省略 **`MODE`**，仅用 `jdbc:h2:mem:...;DB_CLOSE_DELAY=-1` 等参数（以当前 **`application-test.yml`** 为准）。
+
+## 质量门禁
+
+- **`mvn verify`**：会跑测试并执行 JaCoCo **`check`**（门槛见 **`pom.xml`** 中 `jacoco-maven-plugin`）。改订单核心类时若 check 失败，优先补测试或**经评审**再调门槛，禁止无说明放宽。
+
+## 文档与 OpenSpec
+
+- 集成测试类名、是否 stub 后端、CI 命令等若影响验收，需与 **`openspec/changes/.../tasks.md`** 或 **`doc/analysis/*`** 中测试描述一致；不确定处标 **待确认**（见 **`evidence-and-uncertainty.mdc`**）。

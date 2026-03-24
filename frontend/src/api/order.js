@@ -1,8 +1,8 @@
 import api from './index'
 
 export const orderApi = {
-  getOrders() {
-    return api.get('/orders')
+  getOrders(params = {}) {
+    return api.get('/orders', { params })
   },
   getOrderById(id) {
     return api.get(`/orders/${id}`)
@@ -12,5 +12,8 @@ export const orderApi = {
   },
   cancelOrder(id) {
     return api.put(`/orders/${id}/cancel`)
+  },
+  confirmReceipt(id) {
+    return api.put(`/orders/${id}/confirm-receipt`)
   }
 }

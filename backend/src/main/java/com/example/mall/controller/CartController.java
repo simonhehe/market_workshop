@@ -54,6 +54,21 @@ public class CartController {
         }
     }
     
+    @PutMapping("/{id}/selection")
+    public ResponseEntity<ApiResponse<Cart>> updateSelection(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            int isSelected = Integer.parseInt(request.get("isSelected").toString());
+            Cart cart = cartService.updateSelection(id, userId, isSelected);
+            return ResponseEntity.ok(ApiResponse.success("购物车选中状态已更新", cart));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("CART_001", e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Cart>> updateQuantity(
             @PathVariable Long id,

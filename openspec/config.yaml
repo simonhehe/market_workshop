@@ -1,0 +1,121 @@
+# OpenSpec context draft — generated from repository-visible facts only.
+# Uncertain items are set to N/A. Adjust schema to match your OpenSpec version if needed.
+
+context:
+  domain:
+    name: 企业内部福利商城
+    description: backend pom.xml description; points-based exchange of goods for enterprise employees.
+    roles_in_code:
+      - user
+      - admin
+    deployment_target: N/A
+
+  tech_stack:
+    backend:
+      language: Java 17
+      framework: Spring Boot 3.2.0
+      build: Maven
+      main_application: com.example.mall.MallApplication
+      persistence: Spring Data JPA
+      database_driver: SQLite JDBC 3.44.1.0
+      dialect: org.hibernate.community.dialect.SQLiteDialect
+      security_libs: spring-security-crypto (BCrypt PasswordEncoder); JWT via jjwt 0.12.3
+      full_spring_security_web: false
+    frontend:
+      framework: Vue 3
+      bundler: Vite 5
+      router: vue-router 4
+      http_client: axios
+      dev_server_port: 3000
+    tooling_in_repo:
+      openspec_cursor_commands: .cursor/commands (opsx-*)
+      ci_config: N/A
+
+  architecture:
+    style: monorepo_with_backend_and_frontend_folders
+    backend_package_root: com.example.mall
+    layers:
+      - controller
+      - service
+      - repository
+      - entity
+      - config
+      - middleware
+      - util
+      - common
+    api_base_path: /api
+    backend_port: 8080
+    frontend_dev_proxy: /api -> http://localhost:8080
+    cross_origin: CorsFilter bean (CorsConfiguration; allowed patterns/headers/methods in code)
+
+  auth:
+    mechanism: JWT Bearer token
+    header: Authorization Bearer
+    login_endpoint: POST /api/auth/login
+    token_claims_in_code:
+      - userId
+      - username
+      - role
+    password_storage: BCrypt for some users; plaintext comparison path exists in AuthService for non-bcrypt hashes
+    filter: AuthMiddleware (OncePerRequestFilter) registered on /*
+    anonymous_path_prefixes_after_context_strip:
+      - /
+      - /health
+      - /auth/login
+      - /products
+      - /categories
+    admin_authorization: role string checked in AdminController methods
+
+  database:
+    engine: SQLite
+    url_in_config: jdbc:sqlite:./database/mall.db
+    ddl_mode: hibernate.hbm2ddl.auto = update
+    sql_file_present: backend/src/main/resources/db/migration/V1__init.sql
+    flyway_or_liquibase_dependency: not_present_in_backend_pom.xml
+    file_location_note: path is relative to process working directory
+
+  core_entities:
+    - User
+    - Product
+    - Category
+    - Order
+    - OrderItem
+    - Cart
+    - Address
+    - Favorite
+    - PointsHistory
+
+  core_flows:
+    - name: login
+      description: POST /auth/login returns token and user identifiers; client stores token (frontend uses localStorage).
+    - name: browse_catalog
+      description: GET /products and GET /categories allowed without JWT per AuthMiddleware exclusions.
+    - name: cart_management
+      description: GET/POST/PUT/DELETE /cart; clear /cart/clear; summary includes selected counts and points.
+    - name: place_order
+      description: POST /orders creates order from cart rows with isSelected=1; deducts points and stock; writes PointsHistory spend; deletes cart rows.
+    - name: user_orders
+      description: GET /orders list with optional status filter; GET /orders/{id} with userId check; PUT /orders/{id}/cancel for pending only with refund and stock restore; PUT /orders/{id}/confirm-receipt shipped to completed (no points/stock change).
+    - name: addresses
+      description: CRUD /addresses scoped by userId in AddressService for create/update/delete.
+    - name: points_history
+      description: GET /points/history optional type filter.
+    - name: favorites
+      description: favorite APIs under FavoriteController (paths per code).
+    - name: admin_back_office
+      description: /admin/* for products orders users categories when role is admin.
+
+  quality_risks:
+    automated_tests_in_repo: backend_src_test_junit_includes_order_confirm_receipt_and_list_filter_ut
+    jwt_secret: stored in application.yml plaintext
+    sqlite_concurrency: single-file embedded DB; typical writer contention limits
+    order_stock_deduction: application-level read-modify-write without documented pessimistic/optimistic locking
+    cart_api: PUT/DELETE /cart/{id} does not bind cart row to userId in controller
+    order_create_address: addressId not validated against current user in OrderService.createOrder
+    admin_order_status: arbitrary status string; admin-set cancelled does not mirror user-cancel refund behavior
+    frontend_order_ui: Cart checkout navigates to /orders/create which collides with dynamic route /orders/:id in router
+    health_test_endpoint: HealthController /test response mentions Java 21 while pom targets Java 17
+
+  notes:
+    readme_at_repo_root: N/A
+    license_file: N/A

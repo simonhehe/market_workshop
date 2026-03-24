@@ -10,6 +10,9 @@ export const cartApi = {
   updateQuantity(id, quantity) {
     return api.put(`/cart/${id}`, { quantity })
   },
+  updateSelection(id, isSelected) {
+    return api.put(`/cart/${id}/selection`, { isSelected })
+  },
   removeFromCart(id) {
     return api.delete(`/cart/${id}`)
   },

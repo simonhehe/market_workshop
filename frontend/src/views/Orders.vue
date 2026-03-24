@@ -2,6 +2,23 @@
   <Layout>
     <div class="orders-page">
       <h2>我的订单</h2>
+
+      <div class="filter-bar">
+        <label for="order-status-filter">状态筛选</label>
+        <select
+          id="order-status-filter"
+          v-model="statusFilter"
+          @change="onStatusFilterChange"
+          class="status-filter"
+        >
+          <option value="">全部</option>
+          <option value="pending">待处理</option>
+          <option value="processing">处理中</option>
+          <option value="shipped">已发货</option>
+          <option value="completed">已完成</option>
+          <option value="cancelled">已取消</option>
+        </select>
+      </div>
       
       <div v-if="orders.length === 0" class="empty">
         暂无订单
@@ -28,6 +45,13 @@
             >
               取消订单
             </button>
+            <button
+              v-if="order.status === 'shipped'"
+              @click="confirmReceipt(order.id)"
+              class="confirm-btn"
+            >
+              确认收货
+            </button>
           </div>
         </div>
       </div>
@@ -44,7 +68,8 @@ export default {
   components: { Layout },
   data() {
     return {
-      orders: []
+      orders: [],
+      statusFilter: ''
     }
   },
   async mounted() {
@@ -53,13 +78,17 @@ export default {
   methods: {
     async loadOrders() {
       try {
-        const response = await orderApi.getOrders()
+        const params = this.statusFilter ? { status: this.statusFilter } : {}
+        const response = await orderApi.getOrders(params)
         if (response.success) {
           this.orders = response.data
         }
       } catch (err) {
         console.error('加载订单失败', err)
       }
+    },
+    onStatusFilterChange() {
+      this.loadOrders()
     },
     getStatusText(status) {
       const statusMap = {
@@ -100,6 +129,18 @@ export default {
       } catch (err) {
         alert(err.response?.data?.message || '取消失败')
       }
+    },
+    async confirmReceipt(id) {
+      if (!confirm('确认已收到商品？')) return
+      try {
+        const response = await orderApi.confirmReceipt(id)
+        if (response.success) {
+          alert('确认收货成功')
+          await this.loadOrders()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '确认收货失败')
+      }
     }
   }
 }
@@ -113,6 +154,25 @@ export default {
 .orders-page h2 {
   font-size: 24px;
   margin-bottom: 24px;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filter-bar label {
+  font-size: 14px;
+  color: #666;
+}
+
+.status-filter {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  min-width: 160px;
 }
 
 .empty {
@@ -199,5 +259,9 @@ export default {
 
 .cancel-btn {
   background: #f44336 !important;
+}
+
+.confirm-btn {
+  background: #4caf50 !important;
 }
 </style>

@@ -44,10 +44,14 @@ public class OrderController {
     
     @GetMapping
     public ResponseEntity<ApiResponse<List<Order>>> getUserOrders(
-            @RequestAttribute("userId") Long userId) {
+            @RequestAttribute("userId") Long userId,
+            @RequestParam(required = false) String status) {
         try {
-            List<Order> orders = orderService.getUserOrders(userId);
+            List<Order> orders = orderService.getUserOrders(userId, status);
             return ResponseEntity.ok(ApiResponse.success("获取订单列表成功", orders));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("ORDER_004", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_002", e.getMessage()));
@@ -95,6 +99,19 @@ public class OrderController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_002", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{id}/confirm-receipt")
+    public ResponseEntity<ApiResponse<Order>> confirmReceipt(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId) {
+        try {
+            Order order = orderService.confirmReceipt(id, userId);
+            return ResponseEntity.ok(ApiResponse.success("确认收货成功", order));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("ORDER_003", e.getMessage()));
         }
     }
 }

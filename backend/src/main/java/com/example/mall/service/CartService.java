@@ -64,6 +64,20 @@ public class CartService {
     }
     
     @Transactional
+    public Cart updateSelection(Long cartId, Long userId, int isSelected) {
+        if (isSelected != 0 && isSelected != 1) {
+            throw new RuntimeException("isSelected 只能为 0 或 1");
+        }
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此购物车项");
+        }
+        cart.setIsSelected(isSelected);
+        return cartRepository.save(cart);
+    }
+
+    @Transactional
     public void removeFromCart(Long cartId) {
         cartRepository.deleteById(cartId);
     }

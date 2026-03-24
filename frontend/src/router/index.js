@@ -6,6 +6,7 @@ import ProductDetail from '../views/ProductDetail.vue'
 import Cart from '../views/Cart.vue'
 import Orders from '../views/Orders.vue'
 import OrderDetail from '../views/OrderDetail.vue'
+import OrderCreate from '../views/OrderCreate.vue'
 import Profile from '../views/Profile.vue'
 import Favorites from '../views/Favorites.vue'
 import AdminDashboard from '../views/admin/Dashboard.vue'
@@ -47,6 +48,12 @@ const routes = [
     path: '/orders',
     name: 'Orders',
     component: Orders,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/orders/create',
+    name: 'OrderCreate',
+    component: OrderCreate,
     meta: { requiresAuth: true }
   },
   {

@@ -33,6 +33,25 @@
           <p>收货地址：{{ order.receiverAddress }}</p>
           <p>收货人：{{ order.receiver }} {{ order.receiverPhone }}</p>
         </div>
+
+        <div class="order-actions">
+          <button
+            v-if="order.status === 'pending'"
+            type="button"
+            class="cancel-btn"
+            @click="cancelOrder"
+          >
+            取消订单
+          </button>
+          <button
+            v-if="order.status === 'shipped'"
+            type="button"
+            class="confirm-btn"
+            @click="confirmReceipt"
+          >
+            确认收货
+          </button>
+        </div>
       </div>
     </div>
   </Layout>
@@ -62,7 +81,15 @@ export default {
       this.errorMessage = ''
 
       try {
-        const id = this.$route.params.id
+        const raw = this.$route.params.id
+        if (raw === 'create' || !/^\d+$/.test(String(raw))) {
+          this.errorMessage =
+            raw === 'create'
+              ? '这是下单页路径，请使用「确认下单」页面完成结算。'
+              : '无效的订单编号'
+          return
+        }
+        const id = raw
         const response = await orderApi.getOrderById(id)
         if (response.success) {
           this.order = response.data.order
@@ -89,6 +116,30 @@ export default {
     },
     getStatusClass(status) {
       return `status-${status}`
+    },
+    async cancelOrder() {
+      if (!this.order || !confirm('确定要取消这个订单吗？')) return
+      try {
+        const response = await orderApi.cancelOrder(this.order.id)
+        if (response.success) {
+          alert('订单已取消')
+          await this.loadOrder()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '取消失败')
+      }
+    },
+    async confirmReceipt() {
+      if (!this.order || !confirm('确认已收到商品？')) return
+      try {
+        const response = await orderApi.confirmReceipt(this.order.id)
+        if (response.success) {
+          alert('确认收货成功')
+          await this.loadOrder()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '确认收货失败')
+      }
     }
   }
 }
@@ -155,5 +206,29 @@ export default {
 .order-summary p {
   margin-bottom: 8px;
   color: #666;
+}
+
+.order-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 12px;
+}
+
+.order-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.order-actions .cancel-btn {
+  background: #f44336;
+}
+
+.order-actions .confirm-btn {
+  background: #4caf50;
 }
 </style>
