@@ -18,4 +18,4 @@
 - 建议的 OpenSpec change 名（如 `order-checkout-hardening`）  
 
 
-Last indexed: 2026-08-04 — 945 nodes, 1,574 edges; gitnexus status up-to-date.
+Last indexed: 2026-08-04 — 960 nodes, 1,589 edges; gitnexus status up-to-date (market_workshop).
