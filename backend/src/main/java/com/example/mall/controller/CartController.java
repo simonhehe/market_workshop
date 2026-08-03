@@ -55,18 +55,27 @@ public class CartController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Cart>> updateQuantity(
+    public ResponseEntity<ApiResponse<Cart>> updateCartItem(
             @PathVariable Long id,
             @RequestBody Map<String, Object> request) {
         try {
-            Integer quantity = Integer.valueOf(request.get("quantity").toString());
-            Cart cart = cartService.updateQuantity(id, quantity);
-            
-            if (cart == null) {
-                return ResponseEntity.ok(ApiResponse.success("商品已从购物车移除", null));
+            Cart cart = null;
+            if (request.containsKey("isSelected")) {
+                Integer isSelected = Integer.valueOf(request.get("isSelected").toString());
+                cart = cartService.updateSelected(id, isSelected);
             }
-            
-            return ResponseEntity.ok(ApiResponse.success("购物车商品数量更新成功", cart));
+            if (request.containsKey("quantity")) {
+                Integer quantity = Integer.valueOf(request.get("quantity").toString());
+                cart = cartService.updateQuantity(id, quantity);
+                if (cart == null) {
+                    return ResponseEntity.ok(ApiResponse.success("商品已从购物车移除", null));
+                }
+            }
+            if (cart == null) {
+                return ResponseEntity.badRequest()
+                        .body(ApiResponse.error("CART_001", "请提供 quantity 或 isSelected"));
+            }
+            return ResponseEntity.ok(ApiResponse.success("购物车更新成功", cart));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));

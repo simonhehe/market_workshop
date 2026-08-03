@@ -28,7 +28,7 @@ npm install
 
 ## 数据库
 
-- SQLite 文件：`backend/database/mall.db`（首次启动由应用初始化）
+- SQLite 文件：`backend/database/mall.db`（**须先存在目录** `backend/database/`；首次启动由应用初始化）
 - 勿提交本地脏库到课件主分支
 
 ## GitNexus（本仓）

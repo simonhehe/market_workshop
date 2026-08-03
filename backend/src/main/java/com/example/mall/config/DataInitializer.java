@@ -44,7 +44,7 @@ public class DataInitializer implements CommandLineRunner {
         user1.setPassword("password1");
         user1.setEmail("user1@example.com");
         user1.setPhone("13800138001");
-        user1.setPoints(100);
+        user1.setPoints(10000);
         user1.setRole("user");
         user1.setDepartment("技术部");
         user1.setPosition("软件工程师");

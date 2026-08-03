@@ -62,6 +62,14 @@ public class CartService {
         cart.setQuantity(quantity);
         return cartRepository.save(cart);
     }
+
+    @Transactional
+    public Cart updateSelected(Long cartId, Integer isSelected) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        cart.setIsSelected(isSelected != null && isSelected == 1 ? 1 : 0);
+        return cartRepository.save(cart);
+    }
     
     @Transactional
     public void removeFromCart(Long cartId) {

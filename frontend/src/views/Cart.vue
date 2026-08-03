@@ -93,8 +93,15 @@ export default {
       return this.products[productId]?.pointsRequired || 0
     },
     async toggleSelect(item) {
-      // 这里需要后端支持，暂时跳过
-      await this.loadCart()
+      try {
+        const next = item.isSelected === 1 ? 0 : 1
+        const response = await cartApi.updateSelected(item.id, next)
+        if (response.success) {
+          await this.loadCart()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '更新选中状态失败')
+      }
     },
     async updateQuantity(id, quantity) {
       if (quantity < 1) {

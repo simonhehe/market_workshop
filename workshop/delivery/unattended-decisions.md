@@ -19,11 +19,19 @@
 
 | Gate | Result | Notes |
 |------|--------|-------|
-| (filled during run) | | |
+| P0 | 通过 | baseline G1–G5 |
+| P1 | 通过 | PRD v0.2 + order.html |
+| P2 | 通过 | order-checkout-hardening |
+| P3 | 通过 | OrderCreate + address + cart select |
+| P4 | 通过(degraded) | UT 绿；未达 95% |
+| P5 | 通过(API) | 下单+取消；浏览器债项 |
+| P6 | 完成 | compass + playbook |
 
 ## Corrections for human (morning)
 
 - Review D1–D6 and compass `po=agent-proxy` gates
-- Confirm whether to open PR
-- Re-run P5 with real browser if agent walkthrough was API-only
-- Review any checkout UI changes under `frontend/src/views/`
+- Confirm whether to open PR（分支已 push）
+- **浏览器**走查 `http://localhost:3000`：购物车→结算→下单
+- 决定是否接受 quality degraded 或继续冲 95%
+- 可选：删除本地 `backend/database/mall.db` 后重启以加载 user1=10000 积分种子
+- Review checkout UI under `frontend/src/views/OrderCreate.vue`

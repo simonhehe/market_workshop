@@ -145,14 +145,11 @@ class OrderServiceTest {
 
     @Test
     void createOrder_throwsWhenAddressIdNull() {
-        when(cartRepository.findByUserId(USER_ID)).thenReturn(List.of(cartItem));
-        when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(product));
-        when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
-
         RuntimeException ex = assertThrows(RuntimeException.class,
                 () -> orderService.createOrder(USER_ID, null, null));
 
         assertEquals("请先选择收货地址", ex.getMessage());
+        verify(cartRepository, never()).findByUserId(anyLong());
         verify(addressRepository, never()).findById(anyLong());
         verify(orderRepository, never()).save(any());
     }

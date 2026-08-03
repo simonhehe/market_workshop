@@ -27,6 +27,10 @@ public class OrderService {
     
     @Transactional
     public Order createOrder(Long userId, Long addressId, String remark) {
+        if (addressId == null) {
+            throw new RuntimeException("请先选择收货地址");
+        }
+
         // 获取购物车中选中的商品
         List<Cart> cartItems = cartRepository.findByUserId(userId);
         List<Cart> selectedItems = cartItems.stream()
@@ -73,9 +77,6 @@ public class OrderService {
         }
         
         // 获取收货地址
-        if (addressId == null) {
-            throw new RuntimeException("请先选择收货地址");
-        }
         Address address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new RuntimeException("收货地址不存在"));
         
