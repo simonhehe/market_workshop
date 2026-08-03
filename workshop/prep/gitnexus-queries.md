@@ -16,3 +16,6 @@
 - 业务模块列表  
 - 下单结算缺口（半成品：已有 createOrder，缺什么状态/异常/前端闭环）  
 - 建议的 OpenSpec change 名（如 `order-checkout-hardening`）  
+
+
+Last indexed: 2026-08-04 — 945 nodes, 1,574 edges; gitnexus status up-to-date.
