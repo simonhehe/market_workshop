@@ -73,11 +73,11 @@ public class OrderService {
         }
         
         // 获取收货地址
-        Address address = null;
-        if (addressId != null) {
-            address = addressRepository.findById(addressId)
-                    .orElseThrow(() -> new RuntimeException("收货地址不存在"));
+        if (addressId == null) {
+            throw new RuntimeException("请先选择收货地址");
         }
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("收货地址不存在"));
         
         // 创建订单
         Order order = new Order();
@@ -86,15 +86,12 @@ public class OrderService {
         order.setTotalPoints(totalPoints);
         order.setStatus("pending");
         order.setRemark(remark);
-        
-        if (address != null) {
-            order.setReceiver(address.getReceiver());
-            order.setReceiverPhone(address.getPhone());
-            order.setReceiverAddress(address.getProvince() + " " + 
-                    address.getCity() + " " + 
-                    address.getDistrict() + " " + 
-                    address.getDetailAddress());
-        }
+        order.setReceiver(address.getReceiver());
+        order.setReceiverPhone(address.getPhone());
+        order.setReceiverAddress(address.getProvince() + " " +
+                address.getCity() + " " +
+                address.getDistrict() + " " +
+                address.getDetailAddress());
         
         order = orderRepository.save(order);
         

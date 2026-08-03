@@ -5,6 +5,7 @@ import Products from '../views/Products.vue'
 import ProductDetail from '../views/ProductDetail.vue'
 import Cart from '../views/Cart.vue'
 import Orders from '../views/Orders.vue'
+import OrderCreate from '../views/OrderCreate.vue'
 import OrderDetail from '../views/OrderDetail.vue'
 import Profile from '../views/Profile.vue'
 import Favorites from '../views/Favorites.vue'
@@ -47,6 +48,12 @@ const routes = [
     path: '/orders',
     name: 'Orders',
     component: Orders,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/orders/create',
+    name: 'OrderCreate',
+    component: OrderCreate,
     meta: { requiresAuth: true }
   },
   {
