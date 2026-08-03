@@ -1,0 +1,25 @@
+---
+description: "下钻 Modal / 抽屉与原型 DOM 对齐规则（L2+）"
+globs: "openspec/changes/**/ui-parity-checklist.md,product/**/*.html"
+alwaysApply: false
+---
+
+# 产品下钻 UI
+
+## 容器选型
+
+- 使用 HTML 原型中的 overlay + modal 结构，**禁止**用 UI 库默认 Dialog/Drawer 替换原型皮
+
+## 结构
+
+- 面包屑、汇总 KPI、下钻入口、明细表等与 `product/index.html` / `css-dom-map.md` 一致
+
+## 禁止
+
+- 开发态占位文案（「TODO」「加载中…」超过 2s 须有骨架或错误态）
+- teleport 到 body 丢失 `:root` 主题变量
+
+## 关联
+
+- `.cursor/skills/product-ui/SKILL.md`
+- `harness/playbook/visual-parity.md`

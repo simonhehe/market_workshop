@@ -1,0 +1,25 @@
+---
+description: OpenSpec 与规范类文档使用中文撰写，便于阅读
+globs: "openspec/**/*"
+alwaysApply: false
+---
+
+# OpenSpec / 规范文档语言
+
+在本仓库中，凡属于 **OpenSpec 与「规范类」文档** 的正文，**默认使用简体中文** 撰写，便于维护与评审。
+
+## 适用范围
+
+- `openspec/changes/**` 下的 `proposal.md`、`design.md`、`tasks.md`
+- `openspec/changes/**/specs/**/spec.md` 及归档后的 `openspec/specs/**/spec.md`
+- 其他明确标注为需求/规格说明的 Markdown（若新增）
+
+## 写法约定
+
+- **结构标题** 可与 OpenSpec 模板对齐（如 `## Why`、`## ADDED Requirements`），其下说明性正文用中文；若团队更习惯中文结构标题，也可统一为中文（如 `## 背景与动机`、`## 新增需求`），但同一变更内保持一致。
+- **规范用语**：需求句中的规范性动词可用「必须 / 不得 / 应」对应 SHALL / MUST NOT / SHOULD；技术标识符保留英文：`JQL`、环境变量名（如 `JIRA_API_TOKEN`）、URL、项目键 `GIP`、代码路径等。
+- **场景块**：继续使用 `#### Scenario:` 或改为 `#### 场景：` 均可，与同一文件内其它场景标题格式一致；`WHEN` / `THEN` 可写为 **当** / **则** 引导的中文句。
+
+## 反例
+
+- 在规范正文里大段英文描述业务动机或验收标准（除非读者仅限英文且用户明确要求）。

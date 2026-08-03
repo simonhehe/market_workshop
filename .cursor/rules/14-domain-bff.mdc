@@ -1,0 +1,22 @@
+---
+description: "领域 BFF 硬约束（部署后在 globs 中填写目标模块路径）"
+globs: "backend/**/*Controller.java,backend/**/*Service.java,backend/**/*Client.java"
+alwaysApply: false
+---
+
+# 领域 BFF 规则
+
+## 模块定位
+
+- 前缀、上游：见 `.cursor/skills/domain-bff/SKILL.md` 与 `docs/project/playbook/bff-and-backend.md`
+
+## 硬约束
+
+- 分层：Controller → Service → RemoteClient
+- 完整 VO 对外；禁止 JsonNode/Map 响应
+- 鉴权配置化，禁止硬编码 token
+- 派生端点复用已有数据，不增上游调用
+
+## 示范仓
+
+PMSmart BFF 范例见 `e:\myharness`（本 Kit 不含 `backend/`）。
