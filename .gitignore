@@ -55,3 +55,7 @@ pnpm-lock.yaml
 # Uploads
 backend/uploads/
 frontend/uploads/
+
+# Brainstorm visual companion sessions
+.superpowers/
+
