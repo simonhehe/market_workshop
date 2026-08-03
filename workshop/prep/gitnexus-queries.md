@@ -2,7 +2,7 @@
 
 在 Cursor 中对**本仓**依次执行（MCP 或自然语言均可）：
 
-1. `list_repos` — 确认当前索引是 `ywpt_workshop_test`（或本机目录名），不是无关仓。  
+1. `list_repos` — 确认当前索引是本仓：MCP 名多为 `market_workshop`，路径应指向本目录（文件夹名可能是 `ywpt_workshop_test`），不是无关仓。  
 2. `query`：`order checkout createOrder cart points stock`  
    - goal: find order creation and cart-to-order flow  
 3. `context`：`OrderService`  
