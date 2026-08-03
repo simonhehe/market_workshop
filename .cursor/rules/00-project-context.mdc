@@ -1,5 +1,5 @@
 ---
-description: "项目上下文 — 目标项目填写"
+description: "项目上下文 — 福利商城 workshop 载体"
 globs:
 alwaysApply: true
 ---
@@ -8,69 +8,59 @@ alwaysApply: true
 
 ## 项目目标
 
-<!-- TODO: 目标项目填写 -->
+企业内部福利商城 demo；workshop 载体：补齐「下单结算」中等 MVP 并沉淀课件。
 
 ## 技术栈
 
 | 层 | 技术 | 模块路径 |
 |----|------|----------|
-| 后端 | <!-- TODO: 目标项目填写 --> | <!-- TODO: 目标项目填写 --> |
-| 前端 | <!-- TODO: 目标项目填写 --> | <!-- TODO: 目标项目填写 --> |
-| 上游 | <!-- TODO: 目标项目填写 --> | <!-- TODO: 目标项目填写 --> |
-| 测试 | <!-- TODO: 目标项目填写 --> | |
+| 后端 | JDK 17/21 · Spring Boot 3.2 · JPA · SQLite · JWT | `backend/` |
+| 前端 | Vue 3 · Vue Router · Axios · Vite（port 3000） | `frontend/` |
+| 上游 | 无独立上游 BFF | — |
+| 测试 | JUnit（spring-boot-starter-test）；核心包目标 95% | `workshop/prep/coverage-scope.md` |
 
 ## 常用命令
 
 ```bash
-# <!-- TODO: 目标项目填写 -->
+cd backend && mvn -DskipTests package && mvn spring-boot:run
+cd frontend && npm install && npm run dev
+node workshop/scripts/validate-kit.mjs
 ```
 
 ## Harness 命令
 
 ```bash
+# 本场 workshop 不强制运行 harness 运行时（见设计非目标）
 # 新 change 初始化
 /harness:init <change>
 node harness/scripts/harness-init.mjs --change <change>
-
-# 运行 / 续跑 / 状态
-/harness:run <change>
-/harness:resume <change>
-/harness:status <change>
-
-# 机械校验
-node harness/scripts/harness-validate.mjs --change <change> --mode preflight
-node harness/scripts/harness-validate.mjs --change <change> --mode postflight
-node harness/scripts/harness-validate.mjs --change <change> --mode status --json
-node harness/scripts/harness-validate.mjs --change <change> --mode openspec
-
-# 存量 change 补审计字段
-node harness/scripts/harness-init.mjs --change <change> --retrofit
 ```
 
-首次使用：`cd harness/scripts && npm install`
+首次使用：`cd harness/scripts && npm install`（若 harness 目录存在）
 
 ## API / BFF 约定
 
-<!-- TODO: 目标项目填写 -->
+- Backend `context-path=/api`，端口 `8080`
+- Frontend Vite 代理 `/api` → `http://localhost:8080`
+- 鉴权：JWT；`@RequestAttribute("userId")`
 
 ## 开发端口
 
-<!-- TODO: 目标项目填写 -->
+- Backend: `8080`
+- Frontend: `3000`
 
-详见 `docs/project/playbook/e2e-and-env.md`（待建）
+详见 `workshop/prep/env-setup.md`
 
 ## Harness 关联
 
-- 阶段门禁：`harness/design/harness-phase-guard-design.md`
-- 踩坑速查：`harness/playbook/_index.md`
+- 阶段门禁：`harness/design/harness-phase-guard-design.md`（可选）
+- 踩坑速查：`workshop/curriculum/06-踩坑-playbook.md`
 - UI 视觉（L2+）：`.cursor/skills/product-ui/SKILL.md`
-- E2E 环境：`docs/project/playbook/e2e-and-env.md`（待建）
+- Workshop 设计：`docs/superpowers/specs/2026-08-04-ywpt-workshop-pipeline-design.md`
 
 ## 必须遵守
 
 - OpenSpec 流程见 `01-openspec-workflow.mdc`
-- Harness 运行见 `12-delivery-harness.mdc`
-- 新 change 必须先 `/harness:init`；每轮 run 须 `harness-validate` preflight/postflight
-- `harness-state.yaml` 编辑受 `.cursor/hooks.json` 硬拦截（phase 跳跃、伪造人闸、openspec 双源）
-- 编码前扫 playbook 相关域文档
-- 有 HTML 原型时 views 跟 `product-ui`，禁止 Element Plus 默认壳覆盖原型 class
+- 新 change 建议名：`order-checkout-hardening`
+- 编码前扫 `workshop/baseline/project-baseline.md` 与 coverage-scope
+- 有 HTML 原型时 views 跟 `product-ui` / `workshop/product/order.html`

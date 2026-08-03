@@ -2,48 +2,82 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>下单结算 · Workshop P1 Skeleton</title>
+  <title>下单结算 · order.html</title>
   <style>
-    body { font-family: "Segoe UI", sans-serif; margin: 24px; color: #1a1a1a; }
-    h1 { font-size: 1.4rem; }
-    section { border: 1px dashed #999; padding: 12px 16px; margin: 12px 0; }
-    .hint { color: #666; font-size: 0.9rem; }
-    button { padding: 8px 16px; }
-    .error { color: #b00020; }
+    :root { --ink:#1a1a1a; --muted:#666; --line:#d0d0d0; --err:#b00020; --ok:#0b6e4f; }
+    body { font-family: "Segoe UI", "PingFang SC", sans-serif; margin: 0; color: var(--ink); background: #f6f7f8; }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; }
+    .hint { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    section { background: #fff; border: 1px solid var(--line); padding: 16px 18px; margin: 12px 0; }
+    h2 { font-size: 1.05rem; margin: 0 0 12px; }
+    label { display: block; margin: 8px 0 4px; font-size: 0.85rem; color: var(--muted); }
+    select, textarea, button { font: inherit; }
+    select, textarea { width: 100%; box-sizing: border-box; padding: 8px; border: 1px solid var(--line); }
+    .item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--line); }
+    .item:last-child { border-bottom: 0; }
+    .total { font-size: 1.15rem; font-weight: 600; margin-top: 8px; }
+    .bal { color: var(--muted); font-size: 0.9rem; }
+    button.primary { background: var(--ink); color: #fff; border: 0; padding: 10px 18px; cursor: pointer; }
+    button.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .error { color: var(--err); margin: 8px 0 0; }
+    .ok { color: var(--ok); }
   </style>
 </head>
 <body>
-  <!-- WORKSHOP P1 SKELETON: fill during live run -->
-  <h1>下单结算</h1>
-  <p class="hint">一句话需求载体页。现场补文案、字段与交互说明。</p>
+  <!-- WORKSHOP P1: filled during unattended dry-run 2026-08-04 -->
+  <div class="wrap">
+    <h1>下单结算</h1>
+    <p class="hint">从购物车选中商品进入本页 → 选择地址 → 确认积分 → 提交。错误须可读。</p>
 
-  <section id="address">
-    <h2>收货地址</h2>
-    <p class="hint">占位：地址列表 / 选择态</p>
-  </section>
+    <section id="address">
+      <h2>收货地址</h2>
+      <label for="addr">选择地址（必选）</label>
+      <select id="addr">
+        <option value="">请选择收货地址</option>
+        <option value="1">张三 · 138****8001 · 北京市朝阳区示例路 1 号</option>
+      </select>
+      <p class="error" id="addr-err" hidden>请先选择收货地址</p>
+    </section>
 
-  <section id="items">
-    <h2>商品摘要</h2>
-    <p class="hint">占位：购物车选中项、数量、单价积分</p>
-  </section>
+    <section id="items">
+      <h2>商品摘要</h2>
+      <div class="item"><span>示例商品 A × 1</span><span>50 积分</span></div>
+      <div class="item"><span>示例商品 B × 2</span><span>80 积分</span></div>
+    </section>
 
-  <section id="points-summary">
-    <h2>积分合计</h2>
-    <p class="hint">占位：应付积分、账户余额</p>
-  </section>
+    <section id="points-summary">
+      <h2>积分合计</h2>
+      <p class="total">应付：130 积分</p>
+      <p class="bal">账户余额：100 积分</p>
+    </section>
 
-  <section id="submit">
-    <h2>提交</h2>
-    <button type="button">确认下单</button>
-  </section>
+    <section id="submit">
+      <h2>提交</h2>
+      <label for="remark">备注（可选）</label>
+      <textarea id="remark" rows="2" placeholder="给仓管的备注"></textarea>
+      <p style="margin-top:12px"><button class="primary" type="button" id="btn-submit">确认下单</button></p>
+      <p class="ok" id="success" hidden>下单成功（原型示意）</p>
+    </section>
 
-  <section id="error-states">
-    <h2>错误态</h2>
-    <ul class="error">
-      <li>库存不足（文案待补）</li>
-      <li>积分不足（文案待补）</li>
-      <li>未选择地址（文案待补）</li>
-    </ul>
-  </section>
+    <section id="error-states">
+      <h2>错误态（须展示给用户）</h2>
+      <ul class="error">
+        <li>未选择地址：请先选择收货地址</li>
+        <li>库存不足：商品 X 库存不足</li>
+        <li>积分不足：积分不足，当前积分：…，需要积分：…</li>
+        <li>购物车无选中商品：购物车中没有选中的商品</li>
+      </ul>
+    </section>
+  </div>
+  <script>
+    document.getElementById('btn-submit').onclick = function () {
+      var addr = document.getElementById('addr').value;
+      var err = document.getElementById('addr-err');
+      var ok = document.getElementById('success');
+      if (!addr) { err.hidden = false; ok.hidden = true; return; }
+      err.hidden = true; ok.hidden = false;
+    };
+  </script>
 </body>
 </html>
