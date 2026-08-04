@@ -1,7 +1,7 @@
 # AECOS Workshop 课件 v3 设计
 
 **日期:** 2026-08-04  
-**状态:** Draft（待用户审阅后进入 implementation plan）  
+**状态:** Approved（用户确认；进入 implementation plan）  
 **载体:** `ywpt_workshop_test` / GitNexus `market_workshop`  
 **基线课件:** `workshop/curriculum/aecos_workshop_v2.md`（保留）；新建 v3
 
@@ -23,7 +23,7 @@
 
 - 只打开 v3 即可复制 Chat、完成逐步人闸，无需以 P*.md 为唯一操作入口。  
 - L2 原型工具为 **视觉伴随**；PRD 为 **opsx-explore**（与 v2 顺序/工具不同）。  
-- L3-2 对抗目标明确为：**change 与原型&PRD 高度一致**，再进入 L3-3。  
+- L3-2 对抗目标明确为：**change 与原型&PRD 高度一致无分歧**，再进入 L3-3。  
 - L3-3 产出 **分钟级** `docs/superpowers/specs/` + `plans/`。  
 - v1/v2 保留；业务代码不因本设计变更而修改。
 
