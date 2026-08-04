@@ -27,9 +27,7 @@ public class OrderController {
             @RequestAttribute("userId") Long userId,
             @RequestBody Map<String, Object> request) {
         try {
-            Long addressId = request.containsKey("addressId") 
-                    ? Long.valueOf(request.get("addressId").toString()) 
-                    : null;
+            Long addressId = parseAddressId(request);
             String remark = request.containsKey("remark") 
                     ? request.get("remark").toString() 
                     : null;
@@ -95,6 +93,21 @@ public class OrderController {
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_002", e.getMessage()));
+        }
+    }
+
+    private Long parseAddressId(Map<String, Object> request) {
+        if (request == null || !request.containsKey("addressId") || request.get("addressId") == null) {
+            return null;
+        }
+        String raw = request.get("addressId").toString().trim();
+        if (raw.isEmpty()) {
+            return null;
+        }
+        try {
+            return Long.valueOf(raw);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 }

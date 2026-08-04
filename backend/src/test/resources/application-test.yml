@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:file:./target/test-mall.db?mode=memory&cache=shared
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+jwt:
+  secret: mall-secret-key-for-jwt-token-generation-minimum-256-bits-required-for-security
+  expiration: 86400000

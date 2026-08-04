@@ -32,6 +32,8 @@
           <p>总计：{{ order.totalPoints }} 积分</p>
           <p>收货地址：{{ order.receiverAddress }}</p>
           <p>收货人：{{ order.receiver }} {{ order.receiverPhone }}</p>
+          <p v-if="order.remark">备注：{{ order.remark }}</p>
+          <p v-else>备注：无</p>
         </div>
       </div>
     </div>

@@ -1,0 +1,46 @@
+---
+description: OpenSpec / Superpowers 文档与相关对话统一使用简体中文
+globs: "openspec/**/*,docs/superpowers/**/*"
+alwaysApply: true
+---
+
+# OpenSpec / Superpowers 语言约定
+
+在本仓库中，**OpenSpec 变更**与 **Superpowers 规格/计划** 的正文，以及相关说明性对话，**默认使用简体中文**，便于维护、评审与工作坊协作。
+
+## 文档范围（正文用中文）
+
+**OpenSpec**
+
+- `openspec/changes/**`：`proposal.md`、`design.md`、`tasks.md`
+- `openspec/changes/**/specs/**/spec.md`；归档后 `openspec/specs/**/spec.md`
+
+**Superpowers**
+
+- `docs/superpowers/specs/**` — 实施规格（Goal、Non-Goals、验收、File Map 等说明性正文）
+- `docs/superpowers/plans/**` — 分钟级实施计划（Goal、Architecture、步骤说明、Review 备注等）
+
+**其他**：明确标注为需求/规格/计划的 Markdown（若新增，同上述约定）。
+
+## 对话与产出（用中文）
+
+在以下场景，与用户沟通及 Agent 产出说明**使用简体中文**（非代码部分）：
+
+- 编辑或评审上述路径内文档
+- 执行 OpenSpec 流程（Spec → Design → Tasks → Code → Test → Review → Archive）
+- 调用 Superpowers 相关 skill（如 brainstorming、writing-plans、executing-plans、subagent-driven-development、requesting-code-review 等）
+- 讨论某 `change ID` / Superpowers spec·plan 的实现、验收、风险或归档
+
+**仍保留英文**：代码、类名/方法名、HTTP 路径、环境变量、CLI 命令、文件路径、Git 分支名；OpenSpec 模板英文结构标题可保留，其下正文用中文。
+
+## 写法约定
+
+- **结构标题**：可与 OpenSpec 模板对齐（如 `## Why`、`## ADDED Requirements`），说明性正文用中文；同一变更内标题风格保持一致。
+- **规范用语**：需求句用「必须 / 不得 / 应」对应 SHALL / MUST NOT / SHOULD。
+- **场景块**：`#### Scenario:` 或 `#### 场景：` 均可；`WHEN` / `THEN` 可写为 **当** / **则** 引导的中文句。
+- **Superpowers plan**：步骤标题可含英文文件名；步骤内的操作说明、预期结果、失败处理用中文。
+
+## 反例
+
+- 在 spec/plan/tasks 正文中大段英文描述业务动机或验收标准（除非用户明确要求英文且读者仅限英文）。
+- 用英文向用户解释 OpenSpec 变更或 Superpowers 计划中的业务规则与验收结论（标识符与代码片段除外）。

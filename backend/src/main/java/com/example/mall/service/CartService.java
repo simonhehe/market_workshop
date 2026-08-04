@@ -102,4 +102,18 @@ public class CartService {
         
         return summary;
     }
+
+    @Transactional
+    public Cart selectCartItem(Long cartId, Long userId, Integer isSelected) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+        if (!cart.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作此购物车项");
+        }
+        if (isSelected == null || (isSelected != 0 && isSelected != 1)) {
+            throw new RuntimeException("无效的选中状态");
+        }
+        cart.setIsSelected(isSelected);
+        return cartRepository.save(cart);
+    }
 }

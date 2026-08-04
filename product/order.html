@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>确认订单 - 福利商城</title>
+  <style>
+    :root {
+      --jd-red: #e4393c;
+      --jd-red-dark: #c81623;
+      --jd-red-light: #fff0f0;
+      --bg: #f4f4f4;
+      --card: #ffffff;
+      --text: #333333;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #e5e5e5;
+      --success: #52c41a;
+      --warning: #faad14;
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      --radius: 4px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      background: #fff;
+      border-bottom: 2px solid var(--jd-red);
+      padding: 0 24px;
+    }
+    .header-inner {
+      max-width: 1190px;
+      margin: 0 auto;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--jd-red);
+      letter-spacing: 1px;
+    }
+    .logo span { color: var(--text); font-weight: 400; font-size: 16px; margin-left: 12px; }
+    .user-points {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    .user-points strong {
+      color: var(--jd-red);
+      font-size: 18px;
+      margin-left: 4px;
+    }
+
+    /* ── Steps ── */
+    .steps-bar {
+      max-width: 1190px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+    }
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .steps .step { display: flex; align-items: center; gap: 6px; }
+    .steps .step.active { color: var(--jd-red); font-weight: 600; }
+    .steps .step.done { color: var(--text-secondary); }
+    .steps .arrow { margin: 0 12px; color: #ccc; }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 1190px;
+      margin: 16px auto 120px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-head .icon {
+      width: 20px;
+      height: 20px;
+      background: var(--jd-red);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .card-body { padding: 16px 20px; }
+
+    /* ── Address ── */
+    .address-list { display: flex; flex-direction: column; gap: 10px; }
+    .address-item {
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .address-item:hover { border-color: #ffb4b4; }
+    .address-item.selected {
+      border-color: var(--jd-red);
+      background: var(--jd-red-light);
+    }
+    .address-item .radio {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      accent-color: var(--jd-red);
+    }
+    .address-content { margin-left: 28px; }
+    .address-row1 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .address-row1 .name { font-weight: 600; font-size: 15px; }
+    .address-row1 .phone { color: var(--text-secondary); font-size: 14px; }
+    .tag-default {
+      background: var(--jd-red);
+      color: #fff;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 2px;
+    }
+    .address-detail { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+    .address-empty {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+    }
+    .address-empty .hint { margin-top: 8px; font-size: 13px; color: var(--jd-red); }
+
+    /* ── Products ── */
+    .shop-block { margin-bottom: 0; }
+    .product-row {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+    }
+    .product-row:last-child { border-bottom: none; }
+    .product-img {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #f8f8f8, #eee);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    .product-info .title { font-size: 14px; margin-bottom: 6px; line-height: 1.4; }
+    .product-info .spec { font-size: 12px; color: var(--text-muted); }
+    .product-info .stock-warn { font-size: 12px; color: var(--jd-red); margin-top: 4px; display: none; }
+    .product-info .stock-warn.show { display: block; }
+    .product-price {
+      text-align: right;
+      min-width: 100px;
+    }
+    .product-price .points {
+      color: var(--jd-red);
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .product-price .qty { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Remark ── */
+    .remark-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 64px;
+      font-family: inherit;
+    }
+    .remark-input:focus {
+      outline: none;
+      border-color: var(--jd-red);
+    }
+
+    /* ── Sidebar ── */
+    .sidebar { position: sticky; top: 16px; }
+    .summary-card .card-body { padding: 20px; }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+    .summary-row.total {
+      font-size: 15px;
+      color: var(--text);
+      font-weight: 600;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+    .summary-row.total .amount {
+      color: var(--jd-red);
+      font-size: 24px;
+    }
+    .summary-row.total .amount small { font-size: 14px; }
+    .points-gap {
+      margin-top: 10px;
+      padding: 8px 10px;
+      background: #fff7e6;
+      border: 1px solid #ffe58f;
+      border-radius: var(--radius);
+      font-size: 12px;
+      color: #d48806;
+      display: none;
+    }
+    .points-gap.show { display: block; }
+    .btn-submit {
+      width: 100%;
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--jd-red);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--jd-red-dark); }
+    .btn-submit:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* ── Error banner ── */
+    .error-banner {
+      display: none;
+      max-width: 1190px;
+      margin: 12px auto 0;
+      padding: 0 24px;
+    }
+    .error-banner.show { display: block; }
+    .error-inner {
+      background: var(--jd-red-light);
+      border: 1px solid #ffccc7;
+      color: var(--jd-red-dark);
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-inner::before { content: "⚠"; font-size: 16px; }
+
+    /* ── Modal ── */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 8px;
+      width: 420px;
+      max-width: 90vw;
+      padding: 32px 28px;
+      text-align: center;
+      animation: pop 0.25s ease;
+    }
+    @keyframes pop {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .modal-icon.success { background: #f6ffed; color: var(--success); }
+    .modal-icon.error { background: var(--jd-red-light); color: var(--jd-red); }
+    .modal h3 { font-size: 18px; margin-bottom: 8px; }
+    .modal p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+    .modal .order-no { font-size: 13px; color: var(--text-muted); margin-top: 12px; }
+    .modal-actions { margin-top: 24px; display: flex; gap: 12px; justify-content: center; }
+    .modal-actions button {
+      padding: 10px 28px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: var(--jd-red); color: #fff; }
+    .btn-ghost { background: #f5f5f5; color: var(--text); }
+
+    /* ── Demo bar (工作坊演示) ── */
+    .demo-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1f1f1f;
+      color: #ccc;
+      padding: 10px 24px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      z-index: 900;
+    }
+    .demo-bar label { color: #888; }
+    .demo-bar select, .demo-bar button {
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .demo-bar button:hover { background: #444; }
+    .demo-tag {
+      background: #722ed1;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    @media (max-width: 860px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { position: static; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">福利商城<span>确认订单</span></div>
+      <div class="user-points">可用积分：<strong id="userPoints">100</strong></div>
+    </div>
+  </header>
+
+  <div class="steps-bar">
+    <div class="steps">
+      <span class="step done">① 我的购物车</span>
+      <span class="arrow">›</span>
+      <span class="step active">② 填写并核对订单信息</span>
+      <span class="arrow">›</span>
+      <span class="step">③ 成功提交订单</span>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner">
+    <div class="error-inner" id="errorText"></div>
+  </div>
+
+  <main class="page">
+    <div class="main-col">
+      <!-- 收货地址 -->
+      <section class="card" id="addressSection">
+        <div class="card-head">
+          <span class="icon">📍</span>
+          收货人信息
+        </div>
+        <div class="card-body">
+          <div class="address-list" id="addressList"></div>
+        </div>
+      </section>
+
+      <!-- 商品清单 -->
+      <section class="card shop-block">
+        <div class="card-head">
+          <span class="icon">🛒</span>
+          商品清单
+        </div>
+        <div class="card-body" id="productList"></div>
+      </section>
+
+      <!-- 备注 -->
+      <section class="card">
+        <div class="card-head">订单备注</div>
+        <div class="card-body">
+          <textarea class="remark-input" id="remark" placeholder="选填：对本次兑换的特殊说明（最多 100 字）" maxlength="100"></textarea>
+        </div>
+      </section>
+    </div>
+
+    <!-- 右侧合计 -->
+    <aside class="sidebar">
+      <div class="card summary-card">
+        <div class="card-head">应付积分</div>
+        <div class="card-body">
+          <div class="summary-row">
+            <span>商品件数</span>
+            <span id="sumCount">0 件</span>
+          </div>
+          <div class="summary-row">
+            <span>商品积分</span>
+            <span id="sumSubtotal">0 积分</span>
+          </div>
+          <div class="summary-row total">
+            <span>合计</span>
+            <span class="amount"><small>积分 </small><span id="sumTotal">0</span></span>
+          </div>
+          <div class="points-gap" id="pointsGap">
+            积分不足：还需 <strong id="pointsNeed">0</strong> 积分
+          </div>
+          <button class="btn-submit" id="btnSubmit">提交订单</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- 结果弹窗 -->
+  <div class="overlay" id="resultOverlay">
+    <div class="modal">
+      <div class="modal-icon" id="modalIcon"></div>
+      <h3 id="modalTitle"></h3>
+      <p id="modalMsg"></p>
+      <p class="order-no" id="modalOrderNo"></p>
+      <div class="modal-actions">
+        <button class="btn-primary" id="modalClose">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 工作坊演示控制条 -->
+  <div class="demo-bar">
+    <span class="demo-tag">原型演示</span>
+    <label>模拟用户积分</label>
+    <select id="demoPoints">
+      <option value="100" selected>100（user1 默认）</option>
+      <option value="200">200（user2）</option>
+      <option value="50">50（不足场景）</option>
+      <option value="500">500（充足）</option>
+    </select>
+    <label>库存场景</label>
+    <select id="demoStock">
+      <option value="normal" selected>正常库存</option>
+      <option value="low">蓝牙耳机库存不足</option>
+    </select>
+    <button type="button" id="demoClearAddress">清除地址选择</button>
+    <button type="button" id="demoReset">重置页面</button>
+  </div>
+
+  <script>
+    // ── Mock 数据（对齐 baseline 种子与购物车语义）──
+    const ADDRESSES = [
+      {
+        id: 1,
+        receiver: '张三',
+        phone: '13800138001',
+        province: '北京市',
+        city: '北京市',
+        district: '朝阳区',
+        detailAddress: '建国路 88 号 SOHO 现代城 A 座 1201',
+        isDefault: 1
+      },
+      {
+        id: 2,
+        receiver: '张三',
+        phone: '13800138001',
+        province: '上海市',
+        city: '上海市',
+        district: '浦东新区',
+        detailAddress: '世纪大道 1000 号 25 层',
+        isDefault: 0
+      }
+    ];
+
+    const PRODUCTS = [
+      {
+        id: 101,
+        name: '无线蓝牙耳机 · 降噪版',
+        emoji: '🎧',
+        pointsRequired: 80,
+        quantity: 1,
+        stock: 5
+      },
+      {
+        id: 102,
+        name: '保温杯 500ml · 不锈钢',
+        emoji: '☕',
+        pointsRequired: 35,
+        quantity: 1,
+        stock: 20
+      }
+    ];
+
+    let selectedAddressId = ADDRESSES.find(a => a.isDefault === 1)?.id ?? null;
+    let stockMode = 'normal';
+    let userPoints = 100;
+
+    function fullAddress(a) {
+      return `${a.province} ${a.city} ${a.district} ${a.detailAddress}`;
+    }
+
+    function getEffectiveStock(item) {
+      if (stockMode === 'low' && item.id === 101) return 0;
+      return item.stock;
+    }
+
+    function calcTotal() {
+      let count = 0;
+      let total = 0;
+      PRODUCTS.forEach(p => {
+        count += p.quantity;
+        total += p.pointsRequired * p.quantity;
+      });
+      return { count, total };
+    }
+
+    function renderAddresses() {
+      const list = document.getElementById('addressList');
+      if (ADDRESSES.length === 0) {
+        list.innerHTML = `
+          <div class="address-empty">
+            <div>暂无收货地址</div>
+            <div class="hint">请先添加收货地址后再结算</div>
+          </div>`;
+        return;
+      }
+      list.innerHTML = ADDRESSES.map(a => `
+        <div class="address-item ${selectedAddressId === a.id ? 'selected' : ''}"
+             data-id="${a.id}" role="button" tabindex="0">
+          <input type="radio" name="address" class="radio"
+                 ${selectedAddressId === a.id ? 'checked' : ''} />
+          <div class="address-content">
+            <div class="address-row1">
+              <span class="name">${a.receiver}</span>
+              <span class="phone">${a.phone}</span>
+              ${a.isDefault ? '<span class="tag-default">默认</span>' : ''}
+            </div>
+            <div class="address-detail">${fullAddress(a)}</div>
+          </div>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('.address-item').forEach(el => {
+        el.addEventListener('click', () => {
+          selectedAddressId = Number(el.dataset.id);
+          hideError();
+          renderAddresses();
+        });
+      });
+    }
+
+    function renderProducts() {
+      const list = document.getElementById('productList');
+      list.innerHTML = PRODUCTS.map(p => {
+        const stock = getEffectiveStock(p);
+        const low = stock < p.quantity;
+        return `
+          <div class="product-row">
+            <div class="product-img">${p.emoji}</div>
+            <div class="product-info">
+              <div class="title">${p.name}</div>
+              <div class="spec">福利兑换 · 积分支付</div>
+              <div class="product-info stock-warn ${low ? 'show' : ''}" style="display:${low ? 'block' : 'none'}">
+                库存不足，当前仅剩 ${stock} 件
+              </div>
+            </div>
+            <div class="product-price">
+              <div class="points">${p.pointsRequired} 积分</div>
+              <div class="qty">× ${p.quantity}</div>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function updateSummary() {
+      const { count, total } = calcTotal();
+      document.getElementById('sumCount').textContent = `${count} 件`;
+      document.getElementById('sumSubtotal').textContent = `${total} 积分`;
+      document.getElementById('sumTotal').textContent = total;
+      document.getElementById('userPoints').textContent = userPoints;
+
+      const gap = document.getElementById('pointsGap');
+      if (userPoints < total) {
+        gap.classList.add('show');
+        document.getElementById('pointsNeed').textContent = total - userPoints;
+      } else {
+        gap.classList.remove('show');
+      }
+    }
+
+    function showError(msg) {
+      const banner = document.getElementById('errorBanner');
+      document.getElementById('errorText').textContent = msg;
+      banner.classList.add('show');
+      document.getElementById('addressSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function hideError() {
+      document.getElementById('errorBanner').classList.remove('show');
+    }
+
+    function showModal(type, title, msg, orderNo) {
+      const icon = document.getElementById('modalIcon');
+      icon.className = 'modal-icon ' + type;
+      icon.textContent = type === 'success' ? '✓' : '✕';
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalMsg').textContent = msg;
+      document.getElementById('modalOrderNo').textContent = orderNo || '';
+      document.getElementById('resultOverlay').classList.add('show');
+    }
+
+    function validateAndSubmit() {
+      hideError();
+      const { total } = calcTotal();
+
+      // 1. 地址校验
+      if (!selectedAddressId) {
+        showError('请选择收货地址后再提交订单');
+        showModal('error', '提交失败', '您还未选择收货地址，请先选择或新增收货地址。');
+        return;
+      }
+
+      // 2. 库存校验
+      for (const p of PRODUCTS) {
+        const stock = getEffectiveStock(p);
+        if (stock < p.quantity) {
+          const msg = `商品「${p.name}」库存不足，当前库存 ${stock} 件，需要 ${p.quantity} 件`;
+          showError(msg);
+          showModal('error', '库存不足', msg);
+          return;
+        }
+      }
+
+      // 3. 积分校验
+      if (userPoints < total) {
+        const msg = `积分不足，当前积分 ${userPoints}，需要积分 ${total}`;
+        showError(msg);
+        showModal('error', '积分不足', msg);
+        return;
+      }
+
+      // 4. 成功
+      const orderNo = 'ORD' + Date.now();
+      const addr = ADDRESSES.find(a => a.id === selectedAddressId);
+      showModal(
+        'success',
+        '订单提交成功',
+        `收货人：${addr.receiver} ${addr.phone}\n应付积分 ${total} 已冻结，订单进入待处理状态。`,
+        `订单号：${orderNo}`
+      );
+      document.querySelector('.steps .step:nth-child(5)').classList.add('active');
+    }
+
+    // ── Events ──
+    document.getElementById('btnSubmit').addEventListener('click', validateAndSubmit);
+    document.getElementById('modalClose').addEventListener('click', () => {
+      document.getElementById('resultOverlay').classList.remove('show');
+    });
+    document.getElementById('resultOverlay').addEventListener('click', e => {
+      if (e.target.id === 'resultOverlay') e.target.classList.remove('show');
+    });
+
+    document.getElementById('demoPoints').addEventListener('change', e => {
+      userPoints = Number(e.target.value);
+      updateSummary();
+    });
+    document.getElementById('demoStock').addEventListener('change', e => {
+      stockMode = e.target.value;
+      renderProducts();
+    });
+    document.getElementById('demoClearAddress').addEventListener('click', () => {
+      selectedAddressId = null;
+      renderAddresses();
+    });
+    document.getElementById('demoReset').addEventListener('click', () => {
+      selectedAddressId = ADDRESSES.find(a => a.isDefault === 1)?.id ?? null;
+      userPoints = 100;
+      stockMode = 'normal';
+      document.getElementById('demoPoints').value = '100';
+      document.getElementById('demoStock').value = 'normal';
+      document.getElementById('remark').value = '';
+      hideError();
+      renderAll();
+    });
+
+    function renderAll() {
+      renderAddresses();
+      renderProducts();
+      updateSummary();
+    }
+
+    renderAll();
+  </script>
+</body>
+</html>

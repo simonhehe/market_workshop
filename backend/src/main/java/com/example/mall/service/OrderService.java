@@ -72,11 +72,17 @@ public class OrderService {
             throw new RuntimeException("积分不足，当前积分：" + user.getPoints() + "，需要积分：" + totalPoints);
         }
         
-        // 获取收货地址
-        Address address = null;
-        if (addressId != null) {
-            address = addressRepository.findById(addressId)
-                    .orElseThrow(() -> new RuntimeException("收货地址不存在"));
+        // 获取收货地址（必填 + 归属校验，QG-08 / AC-05、AC-06）
+        if (addressId == null) {
+            throw new RuntimeException("请选择收货地址");
+        }
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(() -> new RuntimeException("收货地址不存在"));
+        if (address.getDeletedAt() != null) {
+            throw new RuntimeException("收货地址不存在");
+        }
+        if (!address.getUserId().equals(userId)) {
+            throw new RuntimeException("收货地址不存在");
         }
         
         // 创建订单
@@ -86,15 +92,12 @@ public class OrderService {
         order.setTotalPoints(totalPoints);
         order.setStatus("pending");
         order.setRemark(remark);
-        
-        if (address != null) {
-            order.setReceiver(address.getReceiver());
-            order.setReceiverPhone(address.getPhone());
-            order.setReceiverAddress(address.getProvince() + " " + 
-                    address.getCity() + " " + 
-                    address.getDistrict() + " " + 
-                    address.getDetailAddress());
-        }
+        order.setReceiver(address.getReceiver());
+        order.setReceiverPhone(address.getPhone());
+        order.setReceiverAddress(address.getProvince() + " " +
+                address.getCity() + " " +
+                address.getDistrict() + " " +
+                address.getDetailAddress());
         
         order = orderRepository.save(order);
         

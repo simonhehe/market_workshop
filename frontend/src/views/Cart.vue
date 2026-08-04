@@ -93,8 +93,15 @@ export default {
       return this.products[productId]?.pointsRequired || 0
     },
     async toggleSelect(item) {
-      // 这里需要后端支持，暂时跳过
-      await this.loadCart()
+      const nextSelected = item.isSelected === 1 ? 0 : 1
+      try {
+        const response = await cartApi.selectCartItem(item.id, nextSelected)
+        if (response.success) {
+          await this.loadCart()
+        }
+      } catch (err) {
+        alert(err.response?.data?.message || '更新勾选状态失败')
+      }
     },
     async updateQuantity(id, quantity) {
       if (quantity < 1) {
@@ -122,6 +129,10 @@ export default {
       }
     },
     checkout() {
+      if (this.summary.selectedCount === 0) {
+        alert('请先勾选要结算的商品')
+        return
+      }
       this.$router.push('/orders/create')
     }
   }

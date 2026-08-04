@@ -1,0 +1,373 @@
+# 《AI Coding Workshop》课件 for 福利商城 · 下单结算（v4）
+
+> **项目**：`ywpt_workshop_test`（GitNexus MCP 名：`market_workshop`）  
+> **双主线**：模块交付（中等 MVP 结算闭环）+ 课件沉淀  
+> **结构**：L1 基线 → L2 原型&PRD → L3 OpenSpec 到启服  
+> **时长**：不锁死总时长；下表为**建议分钟**（教练可调）  
+> **镜像**：`prep/prompt-cards/L1–L3.md`、`prep/gate-scripts/L1–L3.md`（课件变更须同步）
+
+配套物料：环境准备 `[aecos_workshop_prep.md](./aecos_workshop_prep.md)`。
+
+---
+
+## 一、课程总流程（讲练一体）
+
+
+| 建议 min | 环节                               | 产物要点                                   |
+| ------ | -------------------------------- | -------------------------------------- |
+| 课前     | Track 0 环境准备                     | 工具就绪（GitNexus 仅安装）                     |
+| ~15    | **L1** 存量扫描与基线                   | `product/baseline/project-baseline.md` |
+| ~20    | **L2-1** 视觉伴随生成原型                | `product/order.html`                   |
+| ~15    | **L2-2** opsx-explore 生成 PRD     | `product/PRD-order-checkout.md`        |
+| ~10    | **L3-1** opsx-propose            | change 四类文件                            |
+| ~20    | **L3-2** brainstorming 对抗        | change 对齐原型&PRD                        |
+| ~15    | **L3-3** 分钟级 spec/plan           | `docs/superpowers/specs` + `plans`     |
+| ~40    | **L3-4** 多 agent 编码（**内嵌 TDD**）  | 业务代码切片 + 每个 task 红→绿证据                 |
+| ~25    | **L3-5** 覆盖率 / E2E + code review | 质量报告 / degraded；补 AC 矩阵缺口              |
+| ~15    | **L3-6** 启服走查                    | `delivery/walkthrough-log.md`          |
+| ~2     | **L3-7** opsx-archive 归档         | change 归档 + rule/skill 沉淀              |
+| 课后     | 罗盘 / 课件收口                        | compass + curriculum                   |
+
+
+**环境前提**：`[aecos_workshop_prep.md](./aecos_workshop_prep.md)`。**对本仓 analyze 在 L1。**
+
+---
+
+
+
+## 二、开场 + 定位 + 方法
+
+**今天要做什么**：半成品福利商城 → 可演示购物车→选地址→下单→扣积分/库存→订单/取消。  
+**带走**：Agent Chat、人闸Review、OpenSpec + superpowers。
+
+
+| 工具           | 干什么                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------- |
+| Cursor Agent | 读项目、写代码、跑命令                                                                                     |
+| OpenSpec     | propose / explore / apply / archive                                                             |
+| superpowers  | brainstorming、writing-plans、subagent-driven-development（**内嵌 TDD**）、requesting-code-review、视觉伴随 |
+| GitNexus     | 存量扫描、impact                                                                                     |
+
+
+**成功标准**：中等 MVP 可演示；质量 ≥95% 或诚实 degraded；每闸真人结论。  
+**非目标**：真实支付、优惠券、拆单、完整售后。
+
+---
+
+
+
+## 三、Phase 0：环境准备
+
+见 `[aecos_workshop_prep.md](./aecos_workshop_prep.md)`。
+
+---
+
+
+
+## 四、L1 · 存量扫描与基线（建议 ~15min）
+
+
+
+### Chat 对话
+
+```text
+使用 GitNexus 对本仓库进行整体分析（不改业务代码）：
+
+1. analyze + 确认本仓：对本仓 analyze；确认 list_repos/status 指向本目录；拉起 GitNexus 预览服务。
+2. 围绕「下单结算」扫存量：结合 GitNexus，扫描技术栈、模块、购物车→订单/积分/库存流程与缺口。
+   技术部分包括：ER 图、user 图、类图、时序图、状态机、API 契约、并发、安全、前端缺口、数据字典、测试矩阵等（紧扣结算叙事，避免无关膨胀）。
+3. 写 baseline + 回填 rules TODO：写入 product/baseline/project-baseline.md；能确定的项回填 .cursor/rules/00-project-context.mdc 的 TODO。
+4. 暂停，等人闸。
+```
+
+> [!IMPORTANT]
+> **人闸检查（闸-L1）**
+>
+> 1. 基线是否写清技术栈与订单相关模块（含与结算相关的关键技术视图/契约摘要）？
+> 2. 缺口是否覆盖「结算闭环 / 状态 / 库存与积分异常」？
+> 3. 是否错误引入支付/优惠券等非目标？
+>
+> **通过:** 可进 L2。  
+> **打回 (R-L1):** 只重跑 GitNexus 相关分析，重写 baseline「缺口」及相关技术节，禁止改业务代码。
+
+
+
+### Tips
+
+- 预览拉不起可记债继续。技术清单服务结算叙事即可。
+
+---
+
+
+
+## 五、L2 · 生成原型与 PRD（建议 ~30–40min）
+
+输入需求（仅此一句）：**「开发下单结算」。**
+
+### 5.1 L2-1 · 视觉伴随生成原型（建议 ~20min）
+
+
+
+#### Chat 对话
+
+```text
+输入：一句话需求「开发下单结算」+ product/baseline/project-baseline.md 缺口。
+产出：product/order.html
+注意：使用 superpowers 的视觉伴随（brainstorming visual companion）生成结算页原型。
+要求：
+- 风格：参考京东商城的下单界面和交互流程
+- 区块：收货地址、商品摘要、积分合计、提交、错误态（未选地址/库存不足/积分不足等）
+- 可演示：选地址 → 看合计 → 提交 → 可见错误或成功示意
+- 中等 MVP；不做管理端；不做真实支付；本步禁止改 backend/frontend 业务代码
+视觉伴随不可用时，可用 HTML 直接生成同等原型，但仍须过人闸。
+完成后暂停，等人闸-L2-原型。
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L2-原型）**
+>
+> 1. 原型能否完成：选地址→看合计→提交→看到错误态？
+> 2. 关键区块是否齐全？样式风格是否与京东购物车一致?
+> 3. 是否仍落在中等 MVP（无支付/管理端偷渡）？
+>
+> **通过:** 进入 L2-2。  
+> **打回 (R-L2-原型):** 只改被点名的区块/交互/错误态；禁止开始写 PRD 或改业务代码。
+
+---
+
+
+
+### 5.2 L2-2 · opsx-explore 生成 PRD（建议 ~15min；仅原型闸通过后）
+
+
+
+#### Chat 对话
+
+```text
+/opsx-explore 基于product/order.html，生成product/PRD-order-checkout.md。
+必须包含：文档头、模块索引、术语与状态机（服务端为状态唯一计算方）、负向需求（MUST NOT）、
+验收规则表（覆盖闭环+状态+库存/积分/地址异常，并尽量映射 coverage 最小集）。
+visual_level 建议 L2。可选 prd-prototype-review，问题记入 compass。
+约束：保持中等 MVP；拒绝支付/优惠券/拆单。
+收货地址：订单界面的地址信息先mock 2条,后续再实现用户收货地址管理功能。
+完成后暂停，等人闸-L2-PRD。
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L2-PRD）**
+>
+> 1. PRD 状态机是否唯一优先级？
+> 2. 负向需求是否清楚？
+> 3. 验收表是否映射到 coverage-scope 最小集？是否与已确认原型一致？
+>
+> **通过:** 可进 L3。  
+> **打回 (R-L2-PRD):** 只改被点名的状态机或 AC 行；拒绝加需求。
+
+---
+
+
+
+## 六、L3 · 基于原型与 PRD 启动 OpenSpec 变更
+
+
+
+### 6.1 L3-1 · opsx-propose（建议 ~10min）
+
+
+
+#### Chat 对话
+
+```text
+/opsx-propose product/PRD-order-checkout.md（可同时引用 order.html 原型）
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L3-propose）**
+>
+> 1. 四类文件是否齐全？
+> 2. 有无支付/优惠券等范围偷渡？
+>
+> **通过:** 进 L3-2。  
+> **打回 (R-L3-propose):** 补齐文件；删除/降级越界项。
+
+---
+
+
+
+### 6.2 L3-2 · brainstorming 对抗（建议 ~20min）
+
+
+
+#### Chat 对话
+
+```text
+/brainstorming
+对照 product/order.html 与 product/PRD-order-checkout.md，
+对 openspec/changes/<名称>做对抗分析。
+重点：发现 propose/specs（及 design/tasks）中与原型&PRD 不一致、歧义、遗漏或范围偷渡；
+目标是修改后的 change 与原型&PRD 高度一致、无关键分歧。
+列出问题 → 我确认后再更新 change 文件。完成后暂停，等人闸。
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L3-对抗）**
+>
+> 1. change 是否与原型&PRD 高度一致？
+> 2. propose/specs 被点名的问题是否已改？
+>
+> **通过:** 进 L3-3。  
+> **打回 (R-L3-对抗):** 按点名修订直到一致。
+
+---
+
+
+
+### 6.3 L3-3 · 分钟级 superpowers spec/plan（建议 ~15min）
+
+
+
+#### Chat 对话
+
+```text
+/writing-plans
+基于该 change 生成superpowers/specs和superpowers/plans内容,其中plans要求是分钟级实施计划
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L3-plan）**
+>
+> 1. plan 是否分钟级、可执行？
+> 2. **每个 Task 是否含 TDD 步骤**（写失败测试 → 跑红 → 最少实现 → 跑绿 → commit）？
+> 3. 是否仍落在中等 MVP？
+>
+> **通过:** 进 L3-4。  
+> **打回 (R-L3-plan):** 缩小/拆分任务；去掉不可控项；补 RED/GREEN 步骤。
+
+---
+
+
+
+### 6.4 L3-4 · 多 agent 编码（建议 ~40min）
+
+**原则：** `/subagent-driven-development` 是编排层；**每个 Task 内部必须遵循** `/test-driven-development`（先测后码，禁止 test-after 整块交付）。
+
+#### 单 Task 标准循环
+
+```
+RED    → 写 1 条失败测试（对应当前 Task 行为）
+VERIFY → 运行测试，确认因「功能缺失」失败（非 typo）
+GREEN  → 写最少生产代码使测试通过
+VERIFY → 全量相关测试仍绿
+REFACTOR（可选）→ 保持全绿
+commit → 更新 openspec/tasks.md 与 plan 勾选
+spec review → code review（subagent 两阶段）
+```
+
+
+
+#### Chat 对话
+
+```text
+/subagent-driven-development
+按 docs/superpowers/plans/<change>.md 逐 Task 执行；
+每个 Task 内强制 /test-driven-development（RED → 跑红 → GREEN → 跑绿 → commit）；
+同步更新 openspec/changes/<名称>/tasks.md 与 plan 勾选状态。
+```
+
+> [!IMPORTANT]
+> **人闸检查（可选 / 重大偏差时）**
+>
+> 1. 抽查 1–2 个 Task：**是否见过测试先失败再变绿**（禁止仅 test-after）？
+> 2. 抽查 1–2 条 PRD AC 是否有代码 + 测试落点；无重大偷渡。
+>
+> （默认可切片口头确认；阻塞级问题打回修。）
+
+---
+
+
+
+### 6.5 L3-5 · 覆盖率 / E2E + requesting-code-review（建议 ~25min）
+
+**定位：** L3-4 已在 Task 内完成 TDD 与后端集成测试；本步**不再**大规模「先写代码后补测试」。聚焦：**覆盖率报告、E2E/走查前置自动化、AC 矩阵缺口、诚实 degraded**。
+
+#### Chat 对话
+
+```text
+1) 对照 prep/coverage-scope.md 与 PRD 验收表：
+   - 统计核心包覆盖率（后端 OrderService/CartService 等；前端 Checkout 若有 Vitest/Playwright 一并计入）
+   - 补 L3-4 未覆盖的 AC 缺口（优先 E2E：选地址→提交→详情；异常 banner+modal）
+   - 目标核心包 ≥95%；达不到则 degraded=true，禁止写「质量通过」
+2) 使用 /requesting-code-review 对照 PRD AC 做审查。
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L3-质量）**
+>
+> 1. 报告/用例是否诚实完整？是否区分「L3-4 已 TDD」与「本步补的 E2E/覆盖率」？
+> 2. ≥95% 或明确 degraded？
+> 3. 每个 PRD AC 是否至少映射一条自动化或 E2E（T10 等人闸项可标注 manual）？
+>
+> **通过:** 进 L3-6。  
+> **打回 (R-L3-质量):** 补 E2E/覆盖率或诚实 degraded；禁止假通过。
+
+---
+
+
+
+### 6.6 L3-6 · 启服预览与人工走查（建议 ~15min）
+
+
+
+#### Chat 对话
+
+```text
+启动前后端服务,拉起预览。
+```
+
+> [!IMPORTANT]
+> **人闸检查（人闸-L3-走查）**
+>
+> 1. 登录 → 加购 → 选中 → 进结算。
+> 2. 正常下单 → 订单列表/详情状态正确。
+> 3. 库存或积分不足（或无地址）→ 明确错误。
+> 4. 取消订单（若 AC 含）→ 状态更新。
+>
+> **通过:** 主路径 + 至少一条异常通过，或阻塞已修。  
+> **打回 (R-L3-走查):** 只修阻塞步骤；更新 walkthrough-log。
+
+---
+
+
+
+### 6.7 L3-7 · opsx-archive 归档（建议 ~2min）
+
+
+
+#### Chat 对话
+
+```text
+/opsx-archive
+将本次变更及会话中有效内容分别整理成rule和skill.
+```
+
+> [!IMPORTANT] **人闸检查（人闸-L3-归档）**
+>
+> 1. 是否归档成功。
+> 2. 沉淀的rules和skill内容是否满足要求。
+
+---
+
+
+
+## 七、复盘 + 答疑
+
+
+| 问题                        | 简答                                                                                  |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| 为何 L2 先视觉伴随再 explore PRD？ | 先锁定看得见的交互，再沉淀可测规格                                                                   |
+| L3-2 与 L3-3 差别？           | 先把 change 对齐原型&PRD；再出分钟级执行 plan                                                     |
+| subagent 与 TDD 谁先谁后？      | **subagent 编排 Task；TDD 在每个 Task 内部最先**（红→绿）；L3-5 只做覆盖率/E2E/审查，不替代 L3-4 的 test-first |
+| 金丝雀能否代替人闸？                | **不能**                                                                              |
+| 95% 达不到？                  | 诚实 degraded                                                                         |
+
+

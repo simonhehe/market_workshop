@@ -23,6 +23,8 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Avoid non-ASCII project path breaking JaCoCo agent destfile on Windows -->
+        <jacoco.data.file>${java.io.tmpdir}/mall-backend-jacoco.exec</jacoco.data.file>
     </properties>
     
     <dependencies>
@@ -116,6 +118,41 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>${surefire.jacoco.args} -XX:+EnableDynamicAgentLoading</argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.11</version>
+                <configuration>
+                    <destFile>${jacoco.data.file}</destFile>
+                    <dataFile>${jacoco.data.file}</dataFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>surefire.jacoco.args</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

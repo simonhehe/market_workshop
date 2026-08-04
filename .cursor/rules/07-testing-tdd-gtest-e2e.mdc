@@ -1,0 +1,97 @@
+---
+description: "用于创建或修改单元测试、TDD 用例、生成测试、集成测试或 E2E 测试。"
+globs: "**/*Test.java,**/*.spec.ts,**/*.test.ts,**/tests/**/*,**/e2e/**/*"
+alwaysApply: false
+---
+
+# 测试规则
+
+## TDD 工作流
+
+- 从 OpenSpec 验收标准出发。
+- 可行时先写或更新测试，再实现。
+- 每条需求至少映射一个测试用例。
+- 测试验证行为，而不是实现细节。
+
+## 后端测试
+
+使用项目既有测试框架。
+
+Java/Spring Boot 常见选项：
+
+- JUnit 5
+- Mockito
+- SpringBootTest
+- MockMvc
+- Testcontainers，前提是项目已支持
+
+关于 GTest：
+
+- 如果 GTest 指 GoogleTest，仅用于 C/C++ 模块。
+- 如果 GTest 指 generated test，则将其作为 AI 生成测试流程，生成后必须人工 Review 再合入。
+
+## 前端测试
+
+覆盖：
+
+- 渲染
+- 状态变化
+- 表单校验
+- API 异常处理
+- 权限行为
+
+## E2E 测试
+
+踩坑速查：`docs/project/playbook/e2e-and-env.md`（端口、Mock BFF、hash 路由、H5 白屏）。
+
+覆盖：
+
+- 核心用户旅程
+- 权限路径
+- 校验失败
+- 易回归场景
+
+E2E 规则：
+
+- 避免任意 sleep。
+- 使用稳定选择器。
+- 断言用户可见行为。
+- 保持测试数据确定性。
+
+## 视觉回归（visual_level ≥ L2）
+
+- 命令：`<!-- TODO: 见 00-project-context 或 docs/project/playbook/visual-parity.md -->`
+- baseline 目录：`<!-- TODO: 如 frontend/e2e/screenshots/<change>/ -->`
+- viewport / `maxDiffPixelRatio`：见项目 playbook
+
+## 后端测试
+
+```bash
+<!-- TODO: 目标项目后端测试命令，如 mvn -pl <module> test -->
+```
+
+## 前端测试
+
+```bash
+<!-- TODO: 目标项目前端测试命令 -->
+```
+
+## 视觉回归 L4（像素级）
+
+- 命令 / 阈值 / drill 矩阵：见 `docs/project/playbook/visual-parity.md`
+- viewport：按 PRD 双端声明填写
+
+## 后端测试环境
+
+- 父 POM / 私服不可解析时，本地可 SKIP 后端测试，但须在 verify/RCA 标明原因
+- CI 须执行 `00-project-context` 中定义的后端测试命令作为 fresh 证据
+
+## 输出格式
+
+每个生成测试说明：
+
+1. 覆盖的需求
+2. 测试层级
+3. Given / When / Then
+4. Mock 或 fixture 策略
+5. 预期断言

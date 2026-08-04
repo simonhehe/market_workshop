@@ -1,0 +1,97 @@
+---
+description: 福利商城下单结算工作坊 — 项目上下文（L1 基线回填）
+globs:
+  - backend/**
+  - frontend/**
+  - workshop/**
+alwaysApply: true
+---
+
+# 福利商城 · 下单结算 — 项目上下文
+
+> 完整基线见 `workshop/product/baseline/project-baseline.md`  
+> GitNexus：对本仓查询时使用 `repo: "E:\\01工作坊s\\aecos_workshop"`
+
+## 项目定位
+
+- **名称**：企业内部福利商城（market_workshop / aecos_workshop）
+
+## 技术栈
+
+| 层 | 选型 |
+|---|---|
+| 后端 | Java 17 · Spring Boot 3.2 · JPA · SQLite |
+| 前端 | Vue 3 · Vue Router 4 · Axios · Vite 5 |
+| 认证 | JWT Bearer（`AuthMiddleware`） |
+| API 前缀 | `/api`（port 8080） |
+| 前端 dev | Vite proxy → `/api` |
+| 测试 | **暂无** — L3 TDD 需补 |
+
+## 目录结构
+
+```
+backend/src/main/java/com/example/mall/
+  controller/  OrderController, CartController, AddressController
+  service/     OrderService ★, CartService, UserService
+  entity/      Order, OrderItem, Cart, Product, User, Address, PointsHistory
+frontend/src/
+  views/       Cart.vue, Orders.vue, OrderDetail.vue — 缺 Checkout
+  api/         cart.js, order.js, address.js
+```
+
+## 结算核心 API
+
+| 操作 | Method | Path |
+|---|---|---|
+| 购物车 | GET/POST | `/cart` |
+| 下单 | POST | `/orders` body: `{addressId, remark?}` |
+| 订单列表 | GET | `/orders` |
+| 订单详情 | GET | `/orders/{id}` |
+| 取消 | PUT | `/orders/{id}/cancel`（仅 pending） |
+| 地址 | GET/POST | `/addresses` |
+
+## 订单状态（服务端为唯一计算方）
+
+```
+pending → cancelled     （用户 cancelOrder）
+pending → processing → shipped → completed  （Admin API，无转换校验）
+```
+
+实体注释：`Order.status` = pending | processing | shipped | completed | cancelled
+
+## 已知缺口（编码前必读）
+
+### P0
+- [ ] 前端结算页 `/orders/create` — **路由与页面均缺失**
+- [ ] 结算页地址选择 UI — `addressApi` 已有，无前端
+- [ ] 后端 `createOrder`：addressId 必填 + 地址归属校验
+- [ ] 购物车勾选 toggle API — `Cart.isSelected` 有字段，前后端均未接通
+
+### P1
+- [ ] 结算错误态：库存不足 / 积分不足 / 未选地址
+- [ ] `PointsHistory.balanceAfter` 使用了扣减前的积分值（Bug）
+- [ ] 购物车 PUT/DELETE 缺少 userId 归属校验
+- [ ] 下单时未校验商品 `status=active`
+
+### P2
+- [ ] 库存/积分并发锁（超卖/双花）
+- [ ] 下单幂等
+- [ ] 自动化测试矩阵 T1–T10（见 baseline §13）
+
+## 种子数据
+
+- user1/password1/100积分 · user2/password2/200 · user3/password3/150 · admin/admin
+
+## 编码约束（工作坊）
+
+- **禁止**：真实支付、优惠券、拆单、管理端结算功能
+- **必须**：服务端状态机为唯一权威；异常信息对用户可见
+- **优先改**：`OrderService`、新增 Checkout 视图、Cart toggle、地址校验
+
+## TODO（L1 未确定 / 待人闸）
+
+- [ ] JDK 版本统一：pom=17，课件写 21 — 工作坊以何为准
+- [ ] 结算页视觉：参照京东风格（L2 原型定稿）
+- [ ] 地址管理是否纳入 Profile 或仅结算页内嵌
+- [ ] Admin 改订单状态是否纳入本次 scope（当前非用户路径）
+- [ ] coverage 目标包范围（`workshop/prep/coverage-scope.md` 待 L3 对齐）

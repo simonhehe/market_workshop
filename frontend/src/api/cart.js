@@ -13,6 +13,9 @@ export const cartApi = {
   removeFromCart(id) {
     return api.delete(`/cart/${id}`)
   },
+  selectCartItem(id, isSelected) {
+    return api.put(`/cart/${id}/select`, { isSelected })
+  },
   clearCart() {
     return api.delete('/cart/clear')
   }
