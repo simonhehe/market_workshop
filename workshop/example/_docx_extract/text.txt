@@ -1,0 +1,250 @@
+适用场景：SpecCoding；工具+SDD框架带来的AI协同交付体验
+安装内容：第二部分内容必须安装，其他为拓展选装部分
+
+一、推荐安装顺序
+先准备网络环境，确保可访问下载源  
+申请Cursor账号
+先安装 Cursor，再安装 Node.js  
+因为后续 OpenSpec 通过 npm 安装，依赖 Node.js  
+然后安装 OpenSpec和superpowers，并完成版本验证  
+
+二、环境准备步骤（必须）
+第 1 步：网络环境准备
+开通网络加速：【IT服务中心】-【网络服务】-【国际资源访问加速】
+[[IMAGE:rId4]]
+连接公司要求的网络环境（如 Glink），打开内网连接
+[[IMAGE:rId5]]
+确认以下站点可正常访问：
+https://github.com
+Node.js — Run JavaScript Everywhere
+npm | Home
+
+如工作坊包含测试环节，建议同时确认以下站点可访问：
+Welcome to Apache Maven – Maven
+Fast and reliable end-to-end testing for modern web apps | Playwright
+
+第 2 步：Cursor订阅&安装
+2.1 Cursor订阅
+
+
+2.2 cursor安装
+下载地址：https://cursor.com/download
+安装对应操作系统版本
+打开cursor，使用2.1中激活的账号完成登录
+建议首次启动后完成基础检查：
+能正常打开本地目录
+能打开内置终端
+能使用对话功能
+
+
+第 3 步：安装 Node.js
+下载地址：https://nodejs.org/en/download
+安装 LTS 版本，且 Node.js 版本 > 20
+安装完成后，在终端执行以下命令检查：
+node -vnpm -v
+[[IMAGE:]]
+node -v
+npm -v
+
+
+第 4 步：安装 OpenSpec
+根据终端工具,选择不同安装方式
+
+4.1 cursor安装
+在终端执行：
+npminstall -g @fission-ai/openspec@latest
+[[IMAGE:]]
+npminstall -g @fission-ai/openspec@latest
+或在Agent对话框输入：
+从github安装openspec
+[[IMAGE:]]
+从github安装openspec
+
+安装完成后执行以下命令验证：
+openspec --version
+[[IMAGE:]]
+openspec --version
+
+第 5 步：安装 superpowers
+安装superpowers
+[[IMAGE:]]
+安装superpowers
+
+
+第 5 步：下载工作坊示例项目
+
+gdds-data-dashboard-0702.zip下载、解压即可
+[[IMAGE:]]
+gdds-data-dashboard-0702.zip下载、解压即可
+
+三、环境检查清单（培训前逐项确认）
+检查项
+检查方式
+通过标准
+是否必选
+状态
+网络环境
+访问 GitHub · Change is constant. GitHub keeps you ahead. · GitHub / nodejs.org / npm | Home
+可正常打开
+是
+
+Cursor
+启动并登录
+可打开项目目录与终端
+是
+
+
+Node.js
+node -v
+版本 ≥ 20
+是
+
+npm
+npm -v
+命令可正常返回版本号
+是
+
+OpenSpec
+openspec --version
+命令可正常返回版本号
+是
+
+项目代码
+git clone 并进入项目目录
+代码下载成功
+是
+
+
+
+附录
+1、cursor
+基础功能介绍
+
+对话模式用途
+阶段
+传统
+AI
+理解
+理解 + 拆解：目标、理解、规划
+Plan
+实现
+写代码、写用例、…
+Agent
+调试
+定位问题，解决问题
+Debug
+
+2、主流SDD工具（GPT生成，仅供参考）
+维度
+Spec Kit（GitHub）
+OpenSpec
+BMAD Method
+PromptX
+出品组织
+GitHub
+Fission AI
+社区方法论（独立AI工程社区）
+社区项目（Prompt工程社区）
+所在国家/地区
+美国
+美国（开源社区主导）
+无明确国家（偏欧美）
+无明确国家（偏欧美）
+组织类型
+科技公司（微软体系）
+开源组织
+方法论 / 社区
+开源社区
+开源情况
+开源
+开源
+半开源（无标准实现）
+部分开源
+定位
+标准化 Spec-Driven 工具包
+轻量 Spec 工作流
+多 Agent 开发方法论
+Prompt + Spec 框架
+核心理念
+Spec = 可执行文档
+Spec = 变更驱动
+Spec = 多角色协作输入
+Spec = Prompt模板源
+复杂度
+⭐⭐⭐
+⭐⭐
+⭐⭐⭐⭐
+⭐⭐⭐
+学习成本
+中
+低
+高
+中
+Spec结构化程度
+高（模板+阶段）
+中（简化 spec）
+高（多角色+流程）
+中（偏 prompt结构）
+Agent支持
+外部Agent（Copilot/Claude等）
+IDE Agent（Cursor等）
+内置多Agent体系
+强（Prompt驱动Agent）
+多Agent能力
+❌
+❌
+✅（核心能力）
+⚠️（弱）
+上下文管理
+强（memory files）
+中（轻量上下文）
+强（角色隔离上下文）
+中（prompt上下文）
+工程化能力
+⭐⭐⭐⭐
+⭐⭐
+⭐⭐⭐⭐
+⭐⭐⭐
+规范约束能力
+强（Spec校验+流程）
+中
+强（流程+角色）
+中
+扩展性
+高（CLI + GitHub生态）
+中
+高（Agent可扩展）
+中
+Token成本
+中
+低
+高
+中
+适合团队规模
+中大型团队
+中小团队
+大型复杂项目
+AI实验/Agent团队
+典型优势
+标准化 + 可落地
+简洁高效
+复杂系统控制力强
+Prompt工程强
+典型短板
+稍重
+能力有限
+过重
+工程化不足
+
+3、OpenSpec 指令总览
+OpenSpec 指令总览
+
+4、AICoding工作坊
+《AI Coding Workshop》课件 for PMSmart
+
+5、AI开发提效实施方案（OpenSpec × Cursor）hedq
+AI开发提效实施方案（OpenSpec × Cursor）hedq
+建议阅读第三章，了解OpenSpec核心指令用途
+[[IMAGE:rId6]]
+
+

@@ -10,12 +10,13 @@
 5. `route_map` 或 `query`：`/orders`  
 6. `impact`：`OrderService` direction=`upstream` — 记录谁依赖结算  
 
-将结论写入 `workshop/baseline/project-baseline.md`：
+将结论写入 `workshop/product/baseline/project-baseline.md`：
 
 - 技术栈表  
 - 业务模块列表  
 - 下单结算缺口（半成品：已有 createOrder，缺什么状态/异常/前端闭环）  
 - 建议的 OpenSpec change 名（如 `order-checkout-hardening`）  
+- （有余力）ER / 类图 / 时序 / 状态机 / API 契约 / 并发与安全要点 / 数据字典 / 测试矩阵等结算相关视图  
 
 
 Last indexed: 2026-08-04 — 960 nodes, 1,589 edges; gitnexus status up-to-date (market_workshop).

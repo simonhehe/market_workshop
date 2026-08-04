@@ -62,5 +62,5 @@ node harness/scripts/harness-init.mjs --change <change>
 
 - OpenSpec 流程见 `01-openspec-workflow.mdc`
 - 新 change 建议名：`order-checkout-hardening`
-- 编码前扫 `workshop/baseline/project-baseline.md` 与 coverage-scope
+- 编码前扫 `workshop/product/baseline/project-baseline.md` 与 coverage-scope
 - 有 HTML 原型时 views 跟 `product-ui` / `workshop/product/order.html`

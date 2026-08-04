@@ -144,3 +144,4 @@
 |------|------|------|
 | 2026-08-04 | 初稿：方案1 + P1 双人闸 + prep 同步 | brainstorming |
 | 2026-08-04 | 用户确认 Spec；implementation plan 见 `docs/superpowers/plans/2026-08-04-aecos-workshop-v2.md` | — |
+| 2026-08-04 | Implemented：`aecos_workshop_v2.md` + prep P1/gates/recovery + 交叉引用（commits 75a5c31…9385d72） | subagent-driven |

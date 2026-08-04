@@ -71,38 +71,30 @@
 ### Chat 对话
 
 ```text
-你是执行学员。对本福利商城仓库依次完成：
+使用 GitNexus 对本仓库进行整体分析（不改业务代码；不扩展支付/优惠券）：
 
-1) 对本仓库根目录执行 GitNexus analyze 建索引；用 status / list（或 MCP list_repos）确认索引指向本目录。
-   注意：MCP 名多为 market_workshop，文件夹名可能是 ywpt_workshop_test，以路径为准。
-
-2) 存量扫描（MCP 或自然语言均可）：
-   - list_repos 确认本仓
-   - query：order checkout createOrder cart points stock（找下单与购物车→订单流）
-   - context：OrderService；context：CartService
-   - route_map 或 query：/orders
-   - impact：OrderService direction=upstream
-
-3) 写入 workshop/baseline/project-baseline.md：技术栈表、业务模块、下单结算缺口、建议 OpenSpec change 名（如 order-checkout-hardening）。
-4) 能确定的项回填 .cursor/rules/00-project-context.mdc 的 TODO。
-5) 暂停，等人闸。
-
-约束：不改业务代码；不扩展到支付/优惠券。
-完整查询剧本镜像：workshop/prep/gitnexus-queries.md
+1. analyze + 确认本仓：对本仓 analyze；确认 list_repos/status 指向本目录；拉起 GitNexus 预览服务。
+2. 围绕「下单结算」扫存量：结合 GitNexus，扫描技术栈、模块、购物车→订单/积分/库存流程与缺口。
+   技术部分包括：ER 图、user 图、类图、时序图、状态机、API 契约、并发、安全、前端缺口、数据字典、测试矩阵等（紧扣结算叙事，避免无关膨胀）。
+3. 写 baseline + 回填 rules TODO：写入 workshop/product/baseline/project-baseline.md；能确定的项回填 .cursor/rules/00-project-context.mdc 的 TODO。
+4. 暂停，等人闸。
 ```
 
-### 人闸检查
-
-1. 基线是否写清技术栈与订单相关模块？  
-2. 缺口是否覆盖「结算闭环 / 状态 / 库存与积分异常」？  
-3. 是否错误引入支付/优惠券等非目标？  
-
-**通过:** 缺口可指导 PRD；无范围膨胀。  
-**打回 (R-P0):** 只重跑 GitNexus 查询相关步，重写 baseline「缺口」节，禁止改代码。
+> [!IMPORTANT]
+> **人闸检查**
+>
+> 1. 基线是否写清技术栈与订单相关模块（含与结算相关的关键技术视图/契约摘要）？  
+> 2. 缺口是否覆盖「结算闭环 / 状态 / 库存与积分异常」？  
+> 3. 是否错误引入支付/优惠券等非目标？  
+>
+> **通过:** 缺口可指导 PRD；无范围膨胀。  
+> **打回 (R-P0):** 只重跑 GitNexus 相关分析，重写 baseline「缺口」及相关技术节，禁止改业务代码。
 
 ### Tips
 
-干跑示范缺口方向：无结算页、地址可选、错误态不统一、缺测试、状态机需冻结。建议 change：`order-checkout-hardening`。
+- 「预览服务」：用 Chat 触发 GitNexus 提供的预览/UI/wiki（以本机已装版本为准）；拉不起则记债并继续扫描，不阻塞 baseline。  
+- 技术清单服务「下单结算」叙事即可，不必做成完整企业架构册。  
+- 干跑示范缺口方向：无结算页、地址可选、错误态不统一、缺测试、状态机需冻结。建议 change：`order-checkout-hardening`。
 
 ---
 
@@ -116,7 +108,7 @@
 
 ```text
 /opsx-explore
-目标：根据一句话需求「开发下单结算」，结合 workshop/baseline/project-baseline.md 中的缺口，探索并生成高质量结算页 HTML 原型。
+目标：根据一句话需求「开发下单结算」，结合 workshop/product/baseline/project-baseline.md 中的缺口，探索并生成高质量结算页 HTML 原型。
 产出：workshop/product/order.html
 要求：
 - 必须包含区块：收货地址、商品摘要、积分合计、提交、错误态（至少覆盖未选地址、库存不足、积分不足）
@@ -127,14 +119,15 @@
 完成后暂停，等人闸-原型。
 ```
 
-#### 人闸检查（人闸-原型）
-
-1. 原型能否完成：选地址→看合计→提交→看到错误态？  
-2. 关键区块是否齐全？  
-3. 是否仍落在中等 MVP（无支付/管理端偷渡）？  
-
-**通过:** 进入 5.2 写 PRD。  
-**打回 (R-P1-原型):** 只改被点名的区块/交互/错误态；禁止开始写 PRD 或改业务代码。
+> [!IMPORTANT]
+> **人闸检查（人闸-原型）**
+>
+> 1. 原型能否完成：选地址→看合计→提交→看到错误态？  
+> 2. 关键区块是否齐全？  
+> 3. 是否仍落在中等 MVP（无支付/管理端偷渡）？  
+>
+> **通过:** 进入 5.2 写 PRD。  
+> **打回 (R-P1-原型):** 只改被点名的区块/交互/错误态；禁止开始写 PRD 或改业务代码。
 
 ---
 
@@ -152,14 +145,15 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 完成后暂停，等人闸-PRD。
 ```
 
-#### 人闸检查（人闸-PRD）
-
-1. PRD 状态机是否唯一优先级？  
-2. 负向需求是否清楚？  
-3. 验收表是否映射到 coverage-scope 最小集？是否与已确认原型一致？  
-
-**通过:** 可进入 P2。  
-**打回 (R-P1-PRD):** 只改被点名的状态机或 AC 行；拒绝加需求。
+> [!IMPORTANT]
+> **人闸检查（人闸-PRD）**
+>
+> 1. PRD 状态机是否唯一优先级？  
+> 2. 负向需求是否清楚？  
+> 3. 验收表是否映射到 coverage-scope 最小集？是否与已确认原型一致？  
+>
+> **通过:** 可进入 P2。  
+> **打回 (R-P1-PRD):** 只改被点名的状态机或 AC 行；拒绝加需求。
 
 #### Tips（可选问答）
 
@@ -186,14 +180,15 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 4) 暂停，等人闸。
 ```
 
-### 人闸检查
-
-1. tasks 是否都能在剩余时间内完成？  
-2. 有无偷渡需求？  
-3. 对抗 5 题是否都有书面结论？  
-
-**通过:** tasks = 中等 MVP。  
-**打回 (R-P2):** 打开 tasks.md，删除或降级越界任务；重新对齐 coverage-scope 最小集。
+> [!IMPORTANT]
+> **人闸检查**
+>
+> 1. tasks 是否都能在剩余时间内完成？  
+> 2. 有无偷渡需求？  
+> 3. 对抗 5 题是否都有书面结论？  
+>
+> **通过:** tasks = 中等 MVP。  
+> **打回 (R-P2):** 打开 tasks.md，删除或降级越界任务；重新对齐 coverage-scope 最小集。
 
 ---
 
@@ -209,12 +204,13 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 5) 暂停，等人闸（口述 AC 抽查，不替代走查）。
 ```
 
-### 人闸检查
-
-任选 2 条 PRD AC，请学员指出代码位置与行为。  
-
-**通过:** 抽查 AC 有实现落点。  
-**打回 (R-P3):** 只修 AC 失败项；禁止大范围重构；对照 canary。
+> [!IMPORTANT]
+> **人闸检查**
+>
+> 任选 2 条 PRD AC，请学员指出代码位置与行为。  
+>
+> **通过:** 抽查 AC 有实现落点。  
+> **打回 (R-P3):** 只修 AC 失败项；禁止大范围重构；对照 canary。
 
 ### Tips（示范非抄答案）
 
@@ -236,14 +232,15 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 5) 暂停，等人闸。
 ```
 
-### 人闸检查
-
-1. 报告是否写明白名单分母？  
-2. 数字 ≥95% 或明确 degraded？  
-3. 最小用例是否全列结果？  
-
-**通过:** 报告诚实且可复训。  
-**打回 (R-P4):** 宣称通过但证据不足 → 优先补白名单内失败用例；或设 degraded 并写明缺口。
+> [!IMPORTANT]
+> **人闸检查**
+>
+> 1. 报告是否写明白名单分母？  
+> 2. 数字 ≥95% 或明确 degraded？  
+> 3. 最小用例是否全列结果？  
+>
+> **通过:** 报告诚实且可复训。  
+> **打回 (R-P4):** 宣称通过但证据不足 → 优先补白名单内失败用例；或设 degraded 并写明缺口。
 
 ---
 
@@ -258,15 +255,16 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 4) 暂停，等产品方签字。
 ```
 
-### 人闸检查（含走查脚本）
-
-1. 登录 → 加购 → 选中 → 进结算。  
-2. 正常下单 → 订单列表可见 → 详情状态正确。  
-3. 制造库存或积分不足（或无地址）→ 看到明确错误。  
-4. 取消订单（若 AC 含）→ 状态更新。  
-
-**通过:** 主路径 + 至少一条异常通过，或阻塞项已修。  
-**打回 (R-P5):** 只修阻塞步骤对应代码；更新 walkthrough-log。
+> [!IMPORTANT]
+> **人闸检查（含走查脚本）**
+>
+> 1. 登录 → 加购 → 选中 → 进结算。  
+> 2. 正常下单 → 订单列表可见 → 详情状态正确。  
+> 3. 制造库存或积分不足（或无地址）→ 看到明确错误。  
+> 4. 取消订单（若 AC 含）→ 状态更新。  
+>
+> **通过:** 主路径 + 至少一条异常通过，或阻塞项已修。  
+> **打回 (R-P5):** 只修阻塞步骤对应代码；更新 walkthrough-log。
 
 ---
 
@@ -281,9 +279,10 @@ visual_level 建议 L2。可选跑 prd-prototype-review，问题记入 compass�
 4) 教练确认六件套可给下一班或列出明确课后 PR。
 ```
 
-### 人闸检查
-
-教练确认：compass 段齐全；六件套可复训或课后 PR 列表明确。（本段无 R-P6；问题记入课后债。）
+> [!IMPORTANT]
+> **人闸检查**
+>
+> 教练确认：compass 段齐全；六件套可复训或课后 PR 列表明确。（本段无 R-P6；问题记入课后债。）
 
 ---
 

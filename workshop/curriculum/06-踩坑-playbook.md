@@ -9,3 +9,10 @@
 | 下单报积分不足 | 种子用户积分 < 商品积分 | user1 提到 10000；或选用低积分商品 | unattended-001 |
 | 无地址错误被积分错误掩盖 | 地址校验顺序靠后 | `addressId==null` 提到 createOrder 最前 | unattended-001 |
 | 覆盖率未达 95% | 一夜之间只加了 Service UT | 诚实 degraded；课后补 JaCoCo 报告与 E2E | unattended-001 |
+| 前端端口连错 | 误用 Vite 默认 5173 | 本仓为 **3000**（见 env-setup） | kit-prep |
+| validate-kit 失败 | REQUIRED 文件缺失或 compass 无 P0–P6 标记 | 对照 `scripts/validate-kit.mjs` 补齐 | kit-prep |
+
+## 使用方式
+
+- 现场：症状→查表→最短处理；写入当段 compass「踩坑」。  
+- 课后：新坑追加一行，注明场次 ID，供下一班讲师手册引用。
