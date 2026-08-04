@@ -25,7 +25,7 @@
 
 | 分钟 | 阶段 | 主要产物 |
 |------|------|----------|
-| 0–15 | P0 存量扫描与基线 | `baseline/project-baseline.md` |
+| 0–15 | P0 存量扫描与基线 | `product/baseline/project-baseline.md` |
 | 15–45 | P1 原型与 PRD | `product/order.html`, `product/PRD-order-checkout.md` |
 | 45–75 | P2 OpenSpec 对抗收敛 | `openspec/changes/<change>/` |
 | 75–120 | P3 编码与审查 | 业务代码改动 + review 要点 |
@@ -43,7 +43,8 @@
 
 | 物料 | 路径 |
 |------|------|
-| **总课件 v2（推荐）** | [curriculum/aecos_workshop_v2.md](curriculum/aecos_workshop_v2.md) |
+| **总课件 v3（推荐）** | [curriculum/aecos_workshop_v3.md](curriculum/aecos_workshop_v3.md) |
+| 总课件 v2 | [curriculum/aecos_workshop_v2.md](curriculum/aecos_workshop_v2.md) |
 | 总课件 v1 | [curriculum/aecos_workshop.md](curriculum/aecos_workshop.md) |
 | **环境准备** | [curriculum/aecos_workshop_prep.md](curriculum/aecos_workshop_prep.md) |
 | 六件套 | [curriculum/01](curriculum/01-讲师手册.md)–[06](curriculum/06-踩坑-playbook.md) |
