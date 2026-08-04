@@ -37,7 +37,17 @@
 
 ## 课前准备
 
-环境、索引与冒烟步骤见 [prep/env-setup.md](prep/env-setup.md)。
+学员必装清单见 [curriculum/aecos_workshop_prep.md](curriculum/aecos_workshop_prep.md)；深化/冒烟见 [prep/env-setup.md](prep/env-setup.md)。
+
+## 授课课件
+
+| 物料 | 路径 |
+|------|------|
+| **总课件 v2（推荐）** | [curriculum/aecos_workshop_v2.md](curriculum/aecos_workshop_v2.md) |
+| 总课件 v1 | [curriculum/aecos_workshop.md](curriculum/aecos_workshop.md) |
+| **环境准备** | [curriculum/aecos_workshop_prep.md](curriculum/aecos_workshop_prep.md) |
+| 六件套 | [curriculum/01](curriculum/01-讲师手册.md)–[06](curriculum/06-踩坑-playbook.md) |
+| 参考示例风格 | [example/《AI Coding Workshop》课件 for PMSmart.md](example/《AI%20Coding%20Workshop》课件%20for%20PMSmart.md) |
 
 ## 如何填写 compass.md
 
@@ -70,11 +80,12 @@ node workshop/scripts/validate-kit.mjs
 workshop/
   README.md              ← 本文件
   compass.md             ← 现场主账
+  example/               ← 参考课件风格（PMSmart）
   prep/                  ← 环境、Prompt 卡、人闸脚本、金丝雀
   baseline/              ← P0 基线
   product/               ← P1 原型与 PRD
   quality/               ← P4 质量报告
   delivery/              ← P5 走查记录
-  curriculum/            ← P6 正式课件六件套
+  curriculum/            ← 总课件 + 六件套（01–06）
   scripts/validate-kit.mjs
 ```
