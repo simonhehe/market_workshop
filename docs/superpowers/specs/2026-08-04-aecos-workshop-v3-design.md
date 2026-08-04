@@ -1,7 +1,8 @@
 # AECOS Workshop 课件 v3 设计
 
 **日期:** 2026-08-04  
-**状态:** Approved（用户确认；进入 implementation plan）  
+**状态:** Implemented  
+
 **载体:** `ywpt_workshop_test` / GitNexus `market_workshop`  
 **基线课件:** `workshop/curriculum/aecos_workshop_v2.md`（保留）；新建 v3
 
@@ -132,3 +133,5 @@
 | 日期 | 变更 | 作者 |
 |------|------|------|
 | 2026-08-04 | 初稿：三大环节 + 全人工闸 + 灵活时长 + 对抗对齐原型PRD + 分钟级 plan | brainstorming |
+| 2026-08-04 | 用户确认；plan 见 `docs/superpowers/plans/2026-08-04-aecos-workshop-v3.md` | — |
+| 2026-08-04 | Implemented：v3 课件 + L* prep + README/手册/compass；validate-kit OK | plan T1–T4 |

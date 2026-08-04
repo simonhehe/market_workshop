@@ -32,7 +32,7 @@
 - Create: `workshop/prep/gate-scripts/L1.md`, `L2.md`, `L3.md`
 - Modify: `workshop/prep/prompt-cards/recovery-cards.md`
 
-- [ ] **Step 1: Write `L1.md`**
+- [x] **Step 1: Write `L1.md`**
 
 ```markdown
 # Prompt 卡 L1 · 存量扫描与基线（建议 ~15min）
@@ -46,7 +46,7 @@
 4. 暂停 → 人闸 L1（见课件 v3 或 `gate-scripts/L1.md`）。  
 ```
 
-- [ ] **Step 2: Write `L2.md`**
+- [x] **Step 2: Write `L2.md`**
 
 ```markdown
 # Prompt 卡 L2 · 生成原型与 PRD（建议 ~30–40min）
@@ -68,7 +68,7 @@
 约束：不做管理端；不做真实支付；拒绝优惠券/拆单。
 ```
 
-- [ ] **Step 3: Write `L3.md`**
+- [x] **Step 3: Write `L3.md`**
 
 ```markdown
 # Prompt 卡 L3 · OpenSpec 变更到启服（建议分钟见课件 v3）
@@ -92,7 +92,7 @@ TDD + requesting-code-review；按 coverage-scope；达不到 95% 则 degraded�
 启 backend:8080 + frontend:3000；走查并写 `workshop/delivery/walkthrough-log.md`。暂停 → 人闸-L3-走查。
 ```
 
-- [ ] **Step 4: Write gate scripts**
+- [x] **Step 4: Write gate scripts**
 
 `workshop/prep/gate-scripts/L1.md`:
 
@@ -146,7 +146,7 @@ TDD + requesting-code-review；按 coverage-scope；达不到 95% 则 degraded�
 **通过:** 本场交付可演示。 **打回:** R-L3-走查。
 ```
 
-- [ ] **Step 5: Append R-L* to recovery-cards.md** (keep existing R-P*)
+- [x] **Step 5: Append R-L* to recovery-cards.md** (keep existing R-P*)
 
 ```markdown
 ## R-L1
@@ -174,7 +174,7 @@ TDD + requesting-code-review；按 coverage-scope；达不到 95% 则 degraded�
 只修阻塞步骤；更新 walkthrough-log。
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add workshop/prep/prompt-cards/L1.md workshop/prep/prompt-cards/L2.md workshop/prep/prompt-cards/L3.md workshop/prep/gate-scripts/L1.md workshop/prep/gate-scripts/L2.md workshop/prep/gate-scripts/L3.md workshop/prep/prompt-cards/recovery-cards.md
@@ -188,13 +188,13 @@ git commit -m "docs(prep): add L1-L3 prompt and gate mirrors for workshop v3"
 **Files:**
 - Create: `workshop/curriculum/aecos_workshop_v3.md`
 
-- [ ] **Step 1: Write full v3** with: header；建议分钟总表（L1/L2-1/L2-2/L3-1…L3-6）；开场；prep 链；L1 Chat=现行 v2 P0；L2-1 视觉伴随；L2-2 opsx-explore PRD；L3-1…6 按 design；人人闸 `[!IMPORTANT]`；L3-2 写明对齐原型&PRD；L3-3 写明分钟级 writing-plans；L3-4 subagent-driven-development；FAQ；P↔L 映射附录。
+- [x] **Step 1: Write full v3** with: header；建议分钟总表（L1/L2-1/L2-2/L3-1…L3-6）；开场；prep 链；L1 Chat=现行 v2 P0；L2-1 视觉伴随；L2-2 opsx-explore PRD；L3-1…6 按 design；人人闸 `[!IMPORTANT]`；L3-2 写明对齐原型&PRD；L3-3 写明分钟级 writing-plans；L3-4 subagent-driven-development；FAQ；P↔L 映射附录。
 
 Suggested minutes: L1 15；L2-1 20；L2-2 15；L3-1 10；L3-2 20；L3-3 15；L3-4 40；L3-5 25；L3-6 15。
 
-- [ ] **Step 2:** Grep 人闸均含 `[!IMPORTANT]`；L2-1 含视觉伴随；L2-2 含 opsx-explore。
+- [x] **Step 2:** Grep 人闸均含 `[!IMPORTANT]`；L2-1 含视觉伴随；L2-2 含 opsx-explore。
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add workshop/curriculum/aecos_workshop_v3.md
@@ -205,18 +205,18 @@ git commit -m "docs(curriculum): add aecos_workshop_v3 L1-L2-L3 courseware"
 
 ### Task 3: Cross-refs + compass
 
-- [ ] README 推荐 v3；保留 v1/v2。  
-- [ ] 01/02/03/05 指向 v3。  
-- [ ] compass：保留 `## P0`…`## P6`；新增 `## L1` `## L2` `## L3`；附录 P↔L 映射。  
-- [ ] `node workshop/scripts/validate-kit.mjs` → OK。  
-- [ ] Commit: `docs: recommend aecos_workshop_v3 and add L-stage compass sections`
+- [x] README 推荐 v3；保留 v1/v2。  
+- [x] 01/02/03/05 指向 v3。  
+- [x] compass：保留 `## P0`…`## P6`；新增 `## L1` `## L2` `## L3`；附录 P↔L 映射。  
+- [x] `node workshop/scripts/validate-kit.mjs` → OK。  
+- [x] Commit: `docs: recommend aecos_workshop_v3 and add L-stage compass sections`
 
 ---
 
 ### Task 4: Verify + mark design
 
-- [ ] Design status → Approved/Implemented 修订行。  
-- [ ] Checklist: v3；L2 工具顺序；L3-2/L3-3 意图；人闸高亮；P 卡仍在；validate OK；无业务代码改动。
+- [x] Design status → Approved/Implemented 修订行。  
+- [x] Checklist: v3；L2 工具顺序；L3-2/L3-3 意图；人闸高亮；P 卡仍在；validate OK；无业务代码改动。
 
 ---
 
