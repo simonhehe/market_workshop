@@ -143,3 +143,4 @@
 | 日期 | 变更 | 作者 |
 |------|------|------|
 | 2026-08-04 | 初稿：方案1 + P1 双人闸 + prep 同步 | brainstorming |
+| 2026-08-04 | 用户确认 Spec；implementation plan 见 `docs/superpowers/plans/2026-08-04-aecos-workshop-v2.md` | — |
