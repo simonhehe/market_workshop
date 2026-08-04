@@ -1,7 +1,7 @@
 # AECOS Workshop 课件 v2 设计
 
 **日期:** 2026-08-04  
-**状态:** Draft（待用户审阅后进入 implementation plan）  
+**状态:** Approved（用户确认；进入 implementation plan）  
 **载体:** `ywpt_workshop_test` / GitNexus `market_workshop`  
 **基线课件:** `workshop/curriculum/aecos_workshop.md`（v1，保留）
 
