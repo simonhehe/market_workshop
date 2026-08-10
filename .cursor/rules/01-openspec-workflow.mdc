@@ -1,0 +1,63 @@
+---
+description: "用于基于 OpenSpec 启动新功能、需求变更、设计生成、任务拆解、实现计划或测试生成。"
+globs: "openspec/**/*"
+alwaysApply: false
+---
+
+# OpenSpec 工作流规则
+
+## 标准流程
+
+遵循以下流程：
+
+Spec -> Design -> Tasks -> Code -> Test -> Review -> RCA -> Archive
+
+## 编码前
+
+始终检查是否存在活跃的 OpenSpec change。
+
+可用时读取以下文件：
+
+- proposal.md
+- specs/**/*.md
+- design.md
+- tasks.md
+
+## 必须遵守
+
+实现前：
+
+1. 总结需求。
+2. 确认受影响模块。
+3. 将验收标准映射到实现任务。
+4. 将验收标准映射到测试用例。
+5. 识别风险或不明确点。
+
+## 实现中
+
+- 不实现 OpenSpec 范围之外的需求。
+- 不静默变更公开 API 契约。
+- 完成任务后更新 tasks.md 状态。
+- 如发现需求不明确，清晰记录问题。
+
+## 测试
+
+测试必须从验收标准生成。
+
+至少考虑：
+
+- 后端单元测试
+- 后端集成测试
+- 前端组件或交互测试
+- 关键用户旅程的 E2E 测试
+
+## 完成后
+
+任务完成时总结：
+
+1. 变更内容
+2. 新增或更新的测试
+3. 建议执行的命令
+4. 剩余风险
+5. 是否可以归档 OpenSpec
+6. **Playbook 回流**：更新 `harness/playbook/_index.md` 至少一行，或在 rca 标明「已对照无新增」（见 `codeflow-review-rca-summary`）

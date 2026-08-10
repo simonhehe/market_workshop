@@ -1,0 +1,45 @@
+---
+description: PRD 与 HTML 原型撰写规范；generation 类知识资产索引
+globs: "product/**/*PRD*.md,product/**/*.html,openspec/changes/**/proposal.md"
+alwaysApply: false
+---
+
+# PRD / 原型撰写规范（Generation）
+
+## 何时阅读
+
+- 新建或大幅改版模块 PRD、HTML 原型
+- 从业务需求转 OpenSpec 之前
+
+## 权威与单写
+
+| 层级 | 写什么 |
+|------|--------|
+| PRD | 业务规则全文、字段矩阵、负向需求、**Mermaid 流程图**、列表列定义表、第三方接口表、验收规则表格 |
+| HTML 原型 | 布局、交互、枚举展示（页面级 `<!-- PRD-SECTION: x.y.z -->`） |
+| OpenSpec | 可测试 SHALL + 场景 |
+| rule/skill | 冻结决策 ID + **链接 PRD 章节**，不重复完整字段表 |
+
+冲突：**PRD 优先**（`01-openspec-workflow`）。
+
+## 高质量 PRD 必备节
+
+修订记录、模块索引、术语、状态机+**Mermaid 流程图**、字段矩阵、**列表列定义表**、负向需求、分层决策表、**第三方接口/组件参考**、**新增编辑详情差异**、数据模型、**验收规则表格（§7.11 追溯表）**、**visual_level**（L0–L4）与样式对齐范围（有 HTML 原型时必填）、开放问题（✅/⚠️）、参考文档。
+
+## 高质量 HTML 原型必备
+
+`query-card` 仅按钮查询（QP-01/D17）；默认无 demo 业务行；枚举与 PRD 一致；列表/看板/工作台骨架见 skill `prd-prototype-authoring`。
+
+## 模板与范例（Kit 内）
+
+- PRD 章节骨架：`.cursor/skills/prd-prototype-authoring/templates/prd-outline.md`
+- 放置约定：`product/README.md`
+- 完整业务正例（示范仓）：`e:\myharness` 下 `doc/` 与 `product/`（本 Kit 不含）
+
+## 操作 Skill
+
+`.cursor/skills/prd-prototype-authoring/SKILL.md`
+
+## 硬约束
+
+本规范相关变更 **禁止修改业务代码**（见 `00-project-context` 模块路径），除非用户另开实现变更。
