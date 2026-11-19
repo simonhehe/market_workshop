@@ -2,6 +2,8 @@
   <Layout>
     <div class="cart-page">
       <h2>购物车</h2>
+
+      <div v-if="noticeMessage" class="notice-banner">{{ noticeMessage }}</div>
       
       <div v-if="cartItems.length === 0" class="empty-cart">
         购物车是空的
@@ -51,6 +53,7 @@ export default {
     return {
       cartItems: [],
       products: {},
+      noticeMessage: '',
       summary: {
         selectedCount: 0,
         totalPoints: 0
@@ -58,6 +61,9 @@ export default {
     }
   },
   async mounted() {
+    if (this.$route?.query?.notice === 'empty') {
+      this.noticeMessage = '请先选择要兑换的商品'
+    }
     await this.loadCart()
   },
   methods: {
@@ -93,8 +99,15 @@ export default {
       return this.products[productId]?.pointsRequired || 0
     },
     async toggleSelect(item) {
-      // 这里需要后端支持，暂时跳过
-      await this.loadCart()
+      const nextSelected = item.isSelected === 1 ? 0 : 1
+      try {
+        const response = await cartApi.selectItem(item.id, nextSelected)
+        if (response.success) {
+          await this.loadCart()
+        }
+      } catch (err) {
+        this.noticeMessage = err.response?.data?.message || '勾选失败，请稍后重试'
+      }
     },
     async updateQuantity(id, quantity) {
       if (quantity < 1) {
@@ -108,7 +121,7 @@ export default {
           await this.loadCart()
         }
       } catch (err) {
-        alert(err.response?.data?.message || '更新失败')
+        this.noticeMessage = err.response?.data?.message || '更新失败'
       }
     },
     async removeItem(id) {
@@ -118,10 +131,14 @@ export default {
           await this.loadCart()
         }
       } catch (err) {
-        alert(err.response?.data?.message || '删除失败')
+        this.noticeMessage = err.response?.data?.message || '删除失败'
       }
     },
     checkout() {
+      if (!this.summary.selectedCount) {
+        this.noticeMessage = '请先选择要兑换的商品'
+        return
+      }
       this.$router.push('/orders/create')
     }
   }
@@ -136,6 +153,15 @@ export default {
 .cart-page h2 {
   font-size: 24px;
   margin-bottom: 24px;
+}
+
+.notice-banner {
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  color: #ad6800;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
 .empty-cart {

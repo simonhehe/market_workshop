@@ -33,6 +33,12 @@
           <p>收货地址：{{ order.receiverAddress }}</p>
           <p>收货人：{{ order.receiver }} {{ order.receiverPhone }}</p>
         </div>
+
+        <p v-if="actionError" class="action-error">{{ actionError }}</p>
+
+        <div v-if="order.status === 'pending'" class="order-actions">
+          <button class="cancel-btn" @click="cancelOrder">取消订单</button>
+        </div>
       </div>
     </div>
   </Layout>
@@ -50,7 +56,8 @@ export default {
       order: null,
       orderItems: [],
       loading: true,
-      errorMessage: ''
+      errorMessage: '',
+      actionError: ''
     }
   },
   async mounted() {
@@ -89,6 +96,21 @@ export default {
     },
     getStatusClass(status) {
       return `status-${status}`
+    },
+    async cancelOrder() {
+      if (!confirm('确定要取消这个订单吗？')) return
+
+      this.actionError = ''
+      try {
+        const response = await orderApi.cancelOrder(this.order.id)
+        if (response.success) {
+          await this.loadOrder()
+        } else {
+          this.actionError = response.message || '取消失败，请稍后重试'
+        }
+      } catch (err) {
+        this.actionError = err.response?.data?.message || '取消失败，请稍后重试'
+      }
     }
   }
 }
@@ -155,5 +177,23 @@ export default {
 .order-summary p {
   margin-bottom: 8px;
   color: #666;
+}
+
+.action-error {
+  color: #f44336;
+  margin-top: 12px;
+}
+
+.order-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+}
+
+.cancel-btn {
+  padding: 8px 20px;
+  background: #f44336;
+  color: white;
+  border-radius: 4px;
 }
 </style>

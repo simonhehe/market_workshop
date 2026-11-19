@@ -7,6 +7,9 @@ export const cartApi = {
   addToCart(productId, quantity = 1) {
     return api.post('/cart', { productId, quantity })
   },
+  selectItem(id, isSelected) {
+    return api.put(`/cart/${id}/select`, { isSelected })
+  },
   updateQuantity(id, quantity) {
     return api.put(`/cart/${id}`, { quantity })
   },
