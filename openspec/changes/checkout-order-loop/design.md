@@ -19,7 +19,7 @@
 }
 ```
 
-HTTP 状态沿用现有约定：业务校验失败返回 400；未登录由 `AuthMiddleware` 返回 401。
+HTTP 状态沿用现有约定：业务校验失败返回 400；未登录由 `AuthMiddleware` 返回 401。合入 `dev` 的购物车归属修复后统一为：归属冲突返回 403 且错误键为 `CART_ITEM_FORBIDDEN`；购物车项不存在返回 404（内部键 `CART_404`，同 `ORDER_NOT_FOUND` 类内部键，不属于 PRD 九类业务错误）。
 
 ### 2.2 下单校验顺序（与 PRD §3.2.1 一致）
 
@@ -47,8 +47,9 @@ HTTP 状态沿用现有约定：业务校验失败返回 400；未登录由 `Aut
 
 - `PUT /api/cart/{id}/select` body `{"isSelected":0|1}`，返回更新后的购物车项。
 - `selectItem(cartId, userId, isSelected)`：归属校验后，`isSelected` 仅允许 0/1，其余 → `CART_SELECTION_INVALID`（入参校验，不属于 PRD 九类业务错误）。
-- `updateQuantity(cartId, userId, quantity)`：归属校验 `CART_ITEM_FORBIDDEN`；`quantity <= 0` 删除；`quantity > stock` → `STOCK_INSUFFICIENT`。
-- `removeFromCart(cartId, userId)`：归属校验 `CART_ITEM_FORBIDDEN`。
+- `updateQuantity(cartId, userId, quantity)`：归属校验 `CART_ITEM_FORBIDDEN`（403）；`quantity <= 0` 删除；`quantity > stock` → `STOCK_INSUFFICIENT`。
+- `removeFromCart(cartId, userId)`：归属校验 `CART_ITEM_FORBIDDEN`（403）。
+- 归属校验统一由 `requireOwnedCart` 完成：缺失项抛 `CartItemNotFoundException`（`CART_404`），他人项抛 `CartAccessDeniedException`（`CART_ITEM_FORBIDDEN`），两者均继承 `BusinessException`。
 - `addToCart`：同一商品累计数量（已有数量 + 本次数量）不得超过库存 → `STOCK_INSUFFICIENT`。
 - Controller 的 PUT/DELETE 增加 `@RequestAttribute("userId")`。
 

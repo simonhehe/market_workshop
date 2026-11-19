@@ -1,6 +1,7 @@
 package com.example.mall.controller;
 
 import com.example.mall.common.BusinessException;
+import com.example.mall.common.CartAccessDeniedException;
 import com.example.mall.entity.Cart;
 import com.example.mall.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,13 +53,13 @@ class CartControllerTest {
     @Test
     void returnsCartItemForbiddenForAnotherUsersSelection() throws Exception {
         when(cartService.selectItem(5L, 1L, 1))
-                .thenThrow(new BusinessException("CART_ITEM_FORBIDDEN", "无权操作此购物车商品"));
+                .thenThrow(new CartAccessDeniedException("无权操作此购物车商品"));
 
         mockMvc.perform(put("/cart/5/select")
                         .requestAttr("userId", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"isSelected\":1}"))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error.code").value("CART_ITEM_FORBIDDEN"));
     }
 
@@ -103,11 +104,11 @@ class CartControllerTest {
 
     @Test
     void returnsBusinessErrorWhenRemovalIsForbidden() throws Exception {
-        doThrow(new BusinessException("CART_ITEM_FORBIDDEN", "无权操作此购物车商品"))
+        doThrow(new CartAccessDeniedException("无权操作此购物车商品"))
                 .when(cartService).removeFromCart(5L, 1L);
 
         mockMvc.perform(delete("/cart/5").requestAttr("userId", 1L))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.error.code").value("CART_ITEM_FORBIDDEN"));
     }
 

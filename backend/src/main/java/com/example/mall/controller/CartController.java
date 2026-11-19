@@ -2,9 +2,12 @@ package com.example.mall.controller;
 
 import com.example.mall.common.ApiResponse;
 import com.example.mall.common.BusinessException;
+import com.example.mall.common.CartAccessDeniedException;
+import com.example.mall.common.CartItemNotFoundException;
 import com.example.mall.entity.Cart;
 import com.example.mall.service.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +73,12 @@ public class CartController {
             Integer isSelected = Integer.valueOf(request.get("isSelected").toString());
             Cart cart = cartService.selectItem(id, userId, isSelected);
             return ResponseEntity.ok(ApiResponse.success("购物车勾选状态更新成功", cart));
+        } catch (CartAccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (BusinessException e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getCode(), e.getMessage()));
@@ -93,6 +102,12 @@ public class CartController {
             }
             
             return ResponseEntity.ok(ApiResponse.success("购物车商品数量更新成功", cart));
+        } catch (CartAccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (BusinessException e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getCode(), e.getMessage()));
@@ -109,6 +124,12 @@ public class CartController {
         try {
             cartService.removeFromCart(id, userId);
             return ResponseEntity.ok(ApiResponse.success("购物车商品删除成功", null));
+        } catch (CartAccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (BusinessException e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error(e.getCode(), e.getMessage()));

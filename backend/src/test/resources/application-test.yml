@@ -1,6 +1,7 @@
 spring:
   datasource:
-    url: jdbc:sqlite:./target/test-mall.db
+    # Each test class overrides this via @DynamicPropertySource with a unique temporary SQLite file.
+    url: jdbc:sqlite:target/mall-test.db
     driver-class-name: org.sqlite.JDBC
 
   jpa:
@@ -18,6 +19,6 @@ spring:
 
 logging:
   level:
-    org.springframework.web: WARN
     org.hibernate: WARN
+    org.springframework.web: WARN
     com.example: INFO

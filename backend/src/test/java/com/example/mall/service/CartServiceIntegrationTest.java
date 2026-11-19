@@ -245,7 +245,7 @@ class CartServiceIntegrationTest {
         BusinessException error = businessError(() ->
                 cartService.updateQuantity(999999L, user.getId(), 2));
 
-        assertThat(error.getCode()).isEqualTo("CART_ITEM_FORBIDDEN");
+        assertThat(error.getCode()).isEqualTo("CART_404");
     }
 
     private BusinessException businessError(org.assertj.core.api.ThrowableAssert.ThrowingCallable action) {

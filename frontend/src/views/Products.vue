@@ -12,7 +12,7 @@
           v-model="keyword" 
           type="text" 
           placeholder="搜索商品..."
-          @input="loadProducts"
+          @input="onKeywordInput"
         />
         <select v-model="sortBy" @change="loadProducts">
           <option value="">默认排序</option>
@@ -21,6 +21,8 @@
           <option value="time">按时间排序</option>
         </select>
       </div>
+      
+      <p class="result-count">共 {{ products.length }} 件商品</p>
       
       <div class="product-grid">
         <div 
@@ -44,7 +46,11 @@
       </div>
       
       <div v-if="products.length === 0" class="empty">
-        暂无商品
+        <template v-if="activeKeyword">
+          <p>未找到与“{{ activeKeyword }}”相关的商品</p>
+          <button class="clear-search" @click="clearSearch">清除搜索</button>
+        </template>
+        <p v-else>暂无商品</p>
       </div>
     </div>
   </Layout>
@@ -63,7 +69,19 @@ export default {
       categories: [],
       selectedCategory: '',
       keyword: '',
-      sortBy: ''
+      sortBy: '',
+      searchTimer: null
+    }
+  },
+  computed: {
+    activeKeyword() {
+      return this.keyword.trim()
+    }
+  },
+  beforeUnmount() {
+    if (this.searchTimer) {
+      clearTimeout(this.searchTimer)
+      this.searchTimer = null
     }
   },
   async mounted() {
@@ -100,11 +118,15 @@ export default {
       }
     },
     async loadProducts() {
+      if (this.searchTimer) {
+        clearTimeout(this.searchTimer)
+        this.searchTimer = null
+      }
       try {
         console.log('Loading products...')
         const params = {}
         if (this.selectedCategory) params.categoryId = this.selectedCategory
-        if (this.keyword) params.keyword = this.keyword
+        if (this.activeKeyword) params.keyword = this.activeKeyword
         if (this.sortBy) params.sortBy = this.sortBy
         
         console.log('Request params:', params)
@@ -120,6 +142,19 @@ export default {
         console.error('加载商品失败', err)
         console.error('Error details:', err.response || err.message)
       }
+    },
+    onKeywordInput() {
+      if (this.searchTimer) {
+        clearTimeout(this.searchTimer)
+      }
+      this.searchTimer = setTimeout(() => {
+        this.searchTimer = null
+        this.loadProducts()
+      }, 300)
+    },
+    clearSearch() {
+      this.keyword = ''
+      this.loadProducts()
     },
     goToDetail(id) {
       this.$router.push(`/products/${id}`)
@@ -148,6 +183,12 @@ export default {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
+}
+
+.result-count {
+  margin-bottom: 12px;
+  color: #666;
+  font-size: 14px;
 }
 
 .product-grid {
@@ -225,5 +266,11 @@ export default {
   padding: 60px 20px;
   color: #999;
   font-size: 16px;
+}
+
+.clear-search {
+  margin-top: 12px;
+  background: #409eff;
+  color: white;
 }
 </style>
