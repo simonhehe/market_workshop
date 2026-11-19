@@ -2,6 +2,7 @@ package com.example.mall.controller;
 
 import com.example.mall.common.BusinessException;
 import com.example.mall.common.CartAccessDeniedException;
+import com.example.mall.common.CartItemNotFoundException;
 import com.example.mall.entity.Cart;
 import com.example.mall.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
@@ -237,5 +238,51 @@ class CartControllerTest {
         mockMvc.perform(get("/cart").requestAttr("userId", 1L))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("CART_ITEM_FORBIDDEN"));
+    }
+
+    @Test
+    void returnsNotFoundWhenSelectingMissingCartItem() throws Exception {
+        when(cartService.selectItem(404L, 1L, 1))
+                .thenThrow(new CartItemNotFoundException("购物车项不存在"));
+
+        mockMvc.perform(put("/cart/404/select")
+                        .requestAttr("userId", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"isSelected\":1}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("CART_404"));
+    }
+
+    @Test
+    void returnsStockErrorWhenUpdatingAboveStock() throws Exception {
+        when(cartService.updateQuantity(5L, 1L, 99))
+                .thenThrow(new BusinessException("STOCK_INSUFFICIENT", "库存不足"));
+
+        mockMvc.perform(put("/cart/5")
+                        .requestAttr("userId", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"quantity\":99}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("STOCK_INSUFFICIENT"));
+    }
+
+    @Test
+    void returnsBusinessErrorWhenRemovalFailsForBusinessReason() throws Exception {
+        doThrow(new BusinessException("CART_ITEM_FORBIDDEN", "无权操作此购物车商品"))
+                .when(cartService).removeFromCart(5L, 1L);
+
+        mockMvc.perform(delete("/cart/5").requestAttr("userId", 1L))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("CART_ITEM_FORBIDDEN"));
+    }
+
+    @Test
+    void returnsBusinessErrorWhenClearingFails() throws Exception {
+        doThrow(new BusinessException("CART_001", "清空购物车失败"))
+                .when(cartService).clearCart(1L);
+
+        mockMvc.perform(delete("/cart/clear").requestAttr("userId", 1L))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("CART_001"));
     }
 }

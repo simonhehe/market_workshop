@@ -233,4 +233,40 @@ describe('Checkout.vue', () => {
 
     expect(wrapper.find('.error-banner').text()).toContain('收货地址无效，请重新选择')
   })
+
+  it('shows the server error when the create response is not successful', async () => {
+    orderApi.createOrder.mockResolvedValue({
+      success: false,
+      message: '请先选择要兑换的商品',
+      error: { code: 'CART_EMPTY', message: '请先选择要兑换的商品' }
+    })
+    const { wrapper } = mountCheckout()
+    await flushPromises()
+
+    await wrapper.findAll('.address-card')[0].trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.error-banner').text()).toContain('请先选择要兑换的商品')
+    expect(wrapper.find('.success-card').exists()).toBe(false)
+  })
+
+  it('navigates from the success card to the order or products', async () => {
+    orderApi.createOrder.mockResolvedValue({
+      success: true,
+      data: { id: 9, orderNo: 'ORD20261120002', totalPoints: 250, status: 'pending' }
+    })
+    const { wrapper, push } = mountCheckout()
+    await flushPromises()
+
+    await wrapper.findAll('.address-card')[0].trigger('click')
+    await wrapper.find('.submit-btn').trigger('click')
+    await flushPromises()
+
+    await wrapper.find('.detail-btn').trigger('click')
+    expect(push).toHaveBeenCalledWith('/orders/9')
+
+    await wrapper.find('.continue-btn').trigger('click')
+    expect(push).toHaveBeenCalledWith('/products')
+  })
 })

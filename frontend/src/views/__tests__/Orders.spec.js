@@ -74,4 +74,30 @@ describe('Orders.vue', () => {
     expect(orderApi.cancelOrder).toHaveBeenCalledWith(1)
     expect(orderApi.getOrders).toHaveBeenCalledTimes(2)
   })
+
+  it('keeps the empty state and logs when loading orders fails', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+    orderApi.getOrders.mockRejectedValue(new Error('network down'))
+
+    const { wrapper } = mountOrders()
+    await flushPromises()
+
+    expect(consoleError).toHaveBeenCalled()
+    expect(wrapper.text()).toContain('暂无订单')
+    consoleError.mockRestore()
+  })
+
+  it('navigates to detail and alerts when cancel fails', async () => {
+    const { wrapper, push } = mountOrders()
+    await flushPromises()
+
+    await wrapper.findAll('.order-card')[0].findAll('.order-actions button')[0].trigger('click')
+    expect(push).toHaveBeenCalledWith('/orders/1')
+
+    orderApi.cancelOrder.mockRejectedValue({ response: { data: { message: '取消失败' } } })
+    await wrapper.find('.cancel-btn').trigger('click')
+    await flushPromises()
+
+    expect(globalThis.alert).toHaveBeenCalledWith('取消失败')
+  })
 })

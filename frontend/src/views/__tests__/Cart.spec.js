@@ -103,4 +103,32 @@ describe('Cart.vue', () => {
 
     expect(wrapper.text()).toContain('无权操作此购物车商品')
   })
+
+  it('shows a message when quantity update fails', async () => {
+    cartApi.updateQuantity.mockRejectedValue({
+      response: { data: { message: '库存不足，无法调整数量' } }
+    })
+    const { wrapper } = mountCart()
+    await flushPromises()
+
+    await wrapper.findAll('.cart-item')[0].findAll('.item-actions button')[1].trigger('click')
+    await flushPromises()
+
+    expect(cartApi.updateQuantity).toHaveBeenCalledWith(11, 3)
+    expect(wrapper.text()).toContain('库存不足，无法调整数量')
+  })
+
+  it('shows a message when removal fails', async () => {
+    cartApi.removeFromCart.mockRejectedValue({
+      response: { data: { message: '无权操作此购物车商品' } }
+    })
+    const { wrapper } = mountCart()
+    await flushPromises()
+
+    await wrapper.findAll('.cart-item')[0].find('.remove-btn').trigger('click')
+    await flushPromises()
+
+    expect(cartApi.removeFromCart).toHaveBeenCalledWith(11)
+    expect(wrapper.text()).toContain('无权操作此购物车商品')
+  })
 })

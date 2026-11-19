@@ -82,4 +82,35 @@ describe('OrderDetail.vue', () => {
     expect(wrapper.text()).toContain('已完成')
     expect(wrapper.find('.cancel-btn').exists()).toBe(false)
   })
+
+  it('shows the server message when cancel returns a failure response', async () => {
+    orderApi.getOrderById.mockResolvedValue(orderDetail('pending'))
+    orderApi.cancelOrder.mockResolvedValue({
+      success: false,
+      message: '当前状态不可取消'
+    })
+
+    const { wrapper } = mountDetail()
+    await flushPromises()
+
+    await wrapper.find('.cancel-btn').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.action-error').text()).toContain('当前状态不可取消')
+  })
+
+  it('shows a fallback message when the cancel request fails', async () => {
+    orderApi.getOrderById.mockResolvedValue(orderDetail('pending'))
+    orderApi.cancelOrder.mockRejectedValue({
+      response: { data: { message: '订单状态已变更' } }
+    })
+
+    const { wrapper } = mountDetail()
+    await flushPromises()
+
+    await wrapper.find('.cancel-btn').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.find('.action-error').text()).toContain('订单状态已变更')
+  })
 })

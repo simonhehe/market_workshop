@@ -200,4 +200,14 @@ class OrderControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("ORDER_002"));
     }
+
+    @Test
+    void returnsBusinessErrorWhenListingOrdersFails() throws Exception {
+        when(orderService.getUserOrders(1L))
+                .thenThrow(new BusinessException("ORDER_STATUS_INVALID", "当前状态不可取消"));
+
+        mockMvc.perform(get("/orders").requestAttr("userId", 1L))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("ORDER_STATUS_INVALID"));
+    }
 }
