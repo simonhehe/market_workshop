@@ -1,5 +1,7 @@
 package com.example.mall.service;
 
+import com.example.mall.common.CartAccessDeniedException;
+import com.example.mall.common.CartItemNotFoundException;
 import com.example.mall.entity.Cart;
 import com.example.mall.entity.Product;
 import com.example.mall.repository.CartRepository;
@@ -50,9 +52,8 @@ public class CartService {
     }
     
     @Transactional
-    public Cart updateQuantity(Long cartId, Integer quantity) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("购物车项不存在"));
+    public Cart updateQuantity(Long userId, Long cartId, Integer quantity) {
+        Cart cart = loadOwnedCart(userId, cartId);
         
         if (quantity <= 0) {
             cartRepository.delete(cart);
@@ -64,8 +65,20 @@ public class CartService {
     }
     
     @Transactional
-    public void removeFromCart(Long cartId) {
-        cartRepository.deleteById(cartId);
+    public void removeFromCart(Long userId, Long cartId) {
+        Cart cart = loadOwnedCart(userId, cartId);
+        cartRepository.delete(cart);
+    }
+    
+    private Cart loadOwnedCart(Long userId, Long cartId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new CartItemNotFoundException("购物车项不存在"));
+        
+        if (!cart.getUserId().equals(userId)) {
+            throw new CartAccessDeniedException("无权操作此购物车项");
+        }
+        
+        return cart;
     }
     
     @Transactional

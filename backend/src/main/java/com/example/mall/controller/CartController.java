@@ -1,9 +1,12 @@
 package com.example.mall.controller;
 
 import com.example.mall.common.ApiResponse;
+import com.example.mall.common.CartAccessDeniedException;
+import com.example.mall.common.CartItemNotFoundException;
 import com.example.mall.entity.Cart;
 import com.example.mall.service.CartService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,16 +60,23 @@ public class CartController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Cart>> updateQuantity(
             @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
             @RequestBody Map<String, Object> request) {
         try {
             Integer quantity = Integer.valueOf(request.get("quantity").toString());
-            Cart cart = cartService.updateQuantity(id, quantity);
+            Cart cart = cartService.updateQuantity(userId, id, quantity);
             
             if (cart == null) {
                 return ResponseEntity.ok(ApiResponse.success("商品已从购物车移除", null));
             }
             
             return ResponseEntity.ok(ApiResponse.success("购物车商品数量更新成功", cart));
+        } catch (CartAccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("CART_403", e.getMessage()));
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("CART_404", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
@@ -74,10 +84,18 @@ public class CartController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> removeFromCart(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> removeFromCart(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId) {
         try {
-            cartService.removeFromCart(id);
+            cartService.removeFromCart(userId, id);
             return ResponseEntity.ok(ApiResponse.success("购物车商品删除成功", null));
+        } catch (CartAccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("CART_403", e.getMessage()));
+        } catch (CartItemNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error("CART_404", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
