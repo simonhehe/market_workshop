@@ -8,7 +8,7 @@
 
 ### 2.1 业务异常
 
-新增 `com.example.mall.common.BusinessException extends RuntimeException`，携带 `code` 字段。业务错误键即 PRD §4.5 键值。Controller 捕获后返回：
+新增 `com.example.mall.common.BusinessException extends RuntimeException`，携带 `code` 字段。业务错误键以 PRD §4.5 为准；另有资源缺失/入参校验的内部错误键（`USER_NOT_FOUND`、`ORDER_NOT_FOUND`、`CART_SELECTION_INVALID`），不替代九类业务错误键。Controller 捕获后返回：
 
 ```json
 {
@@ -27,7 +27,7 @@ HTTP 状态沿用现有约定：业务校验失败返回 400；未登录由 `Aut
 
 1. 读取当前用户选中购物车项；为空 → `CART_EMPTY`。
 2. `addressId == null` → `ADDR_REQUIRED`；地址不存在、已删除或不属于本人 → `ADDR_NOT_FOUND`。
-3. 逐项加载商品；不存在、已删除或 `status != active` → `PRODUCT_UNAVAILABLE`。
+3. 逐项加载商品；不存在或已删除 → `PRODUCT_UNAVAILABLE`（通用提示）；`status != active` → `PRODUCT_UNAVAILABLE`（提示含商品名）。
 4. 逐项校验 `stock >= quantity` → 否则 `STOCK_INSUFFICIENT`（消息含商品名、剩余量与需求量）。
 5. 计算 `totalPoints = Σ pointsRequired × quantity`；用户不存在 → `USER_NOT_FOUND`；余额不足 → `POINTS_INSUFFICIENT`（消息含当前积分、应付、差额）。
 6. 事务内写订单（强制 `pending`、地址快照）、订单项快照、扣积分、扣库存/加销量、写 spend 流水、删除选中购物车项。
@@ -46,6 +46,7 @@ HTTP 状态沿用现有约定：业务校验失败返回 400；未登录由 `Aut
 ### 2.4 购物车
 
 - `PUT /api/cart/{id}/select` body `{"isSelected":0|1}`，返回更新后的购物车项。
+- `selectItem(cartId, userId, isSelected)`：归属校验后，`isSelected` 仅允许 0/1，其余 → `CART_SELECTION_INVALID`（入参校验，不属于 PRD 九类业务错误）。
 - `updateQuantity(cartId, userId, quantity)`：归属校验 `CART_ITEM_FORBIDDEN`；`quantity <= 0` 删除；`quantity > stock` → `STOCK_INSUFFICIENT`。
 - `removeFromCart(cartId, userId)`：归属校验 `CART_ITEM_FORBIDDEN`。
 - `addToCart`：同一商品累计数量（已有数量 + 本次数量）不得超过库存 → `STOCK_INSUFFICIENT`。

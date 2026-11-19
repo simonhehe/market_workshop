@@ -9,6 +9,7 @@
 - [x] T1.3 GREEN：实现 `PUT /api/cart/{id}/select`，为 PUT/DELETE 增加 `userId` 归属校验，`addToCart` 累计库存校验。
 - [x] T1.4 前端 `cartApi.selectItem` + `Cart.vue` 勾选接通、空选中结算提示。
 - [x] T1.5 RED/GREEN：`Cart.spec.js` 覆盖勾选调用与空选中提示。
+- [x] T1.6 补充 select 入参边界码 `CART_SELECTION_INVALID` 的文档与测试（非 PRD 九类业务错误）。
 
 ## T2 下单校验与落库（order-create）
 
