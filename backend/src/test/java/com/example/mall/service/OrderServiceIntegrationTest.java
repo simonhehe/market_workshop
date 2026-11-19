@@ -187,6 +187,7 @@ class OrderServiceIntegrationTest {
                 orderService.createOrder(user.getId(), address.getId(), null));
 
         assertThat(error.getCode()).isEqualTo("PRODUCT_UNAVAILABLE");
+        assertThat(error.getMessage()).contains("已下架商品");
         assertThat(orderService.getUserOrders(user.getId())).isEmpty();
         assertThat(userRepository.findById(user.getId()).orElseThrow().getPoints()).isEqualTo(500);
         assertThat(productRepository.findById(product.getId()).orElseThrow().getStock()).isEqualTo(5);

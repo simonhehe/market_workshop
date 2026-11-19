@@ -53,8 +53,13 @@ public class OrderService {
             int quantity = cartItem.getQuantity() == null ? 0 : cartItem.getQuantity();
             
             Product product = productRepository.findById(cartItem.getProductId())
-                    .filter(item -> item.getDeletedAt() == null && "active".equals(item.getStatus()))
+                    .filter(item -> item.getDeletedAt() == null)
                     .orElseThrow(() -> new BusinessException("PRODUCT_UNAVAILABLE", "商品已下架，请移除后再提交"));
+
+            if (!"active".equals(product.getStatus())) {
+                throw new BusinessException("PRODUCT_UNAVAILABLE", String.format(
+                        "商品「%s」已下架，请移除后再提交", product.getName()));
+            }
             
             int stock = product.getStock() == null ? 0 : product.getStock();
             if (stock < quantity) {
