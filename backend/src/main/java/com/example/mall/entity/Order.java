@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Entity
 @Table(name = "orders")
@@ -58,7 +59,8 @@ public class Order {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (orderNo == null) {
-            orderNo = "ORD" + System.currentTimeMillis();
+            orderNo = "ORD" + System.currentTimeMillis()
+                    + String.format("%04d", ThreadLocalRandom.current().nextInt(10000));
         }
     }
     

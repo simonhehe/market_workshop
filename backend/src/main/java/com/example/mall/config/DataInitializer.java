@@ -17,6 +17,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;
     
     @Override
@@ -35,6 +36,45 @@ public class DataInitializer implements CommandLineRunner {
         if (productRepository.count() == 0) {
             initializeProducts();
         }
+        
+        initializeAddresses();
+    }
+    
+    private void initializeAddresses() {
+        User user1 = userRepository.findByUsername("user1").orElse(null);
+        if (user1 == null) {
+            return;
+        }
+        
+        List<Address> existing = addressRepository
+                .findByUserIdAndDeletedAtIsNullOrderByIsDefaultDesc(user1.getId());
+        if (!existing.isEmpty()) {
+            return;
+        }
+        
+        Address first = new Address();
+        first.setUserId(user1.getId());
+        first.setReceiver("张三");
+        first.setPhone("13800138001");
+        first.setProvince("浙江省");
+        first.setCity("杭州市");
+        first.setDistrict("西湖区");
+        first.setDetailAddress("文一西路 1 号");
+        first.setPostalCode("310000");
+        first.setIsDefault(1);
+        
+        Address second = new Address();
+        second.setUserId(user1.getId());
+        second.setReceiver("李四");
+        second.setPhone("13900139001");
+        second.setProvince("上海市");
+        second.setCity("上海市");
+        second.setDistrict("浦东新区");
+        second.setDetailAddress("世纪大道 100 号");
+        second.setPostalCode("200000");
+        second.setIsDefault(0);
+        
+        addressRepository.saveAll(Arrays.asList(first, second));
     }
     
     private void initializeUsers() {

@@ -26,6 +26,9 @@ target/
 backend/target/
 frontend/dist/
 
+# Test outputs
+coverage/
+
 # Database
 *.db
 *.db-journal

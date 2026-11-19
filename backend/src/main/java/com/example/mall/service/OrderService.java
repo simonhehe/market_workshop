@@ -1,21 +1,22 @@
 package com.example.mall.service;
 
+import com.example.mall.common.BusinessException;
 import com.example.mall.entity.*;
 import com.example.mall.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     
+    private static final int REMARK_MAX_LENGTH = 100;
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartRepository cartRepository;
@@ -23,99 +24,92 @@ public class OrderService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final PointsHistoryRepository pointsHistoryRepository;
-    private final UserService userService;
     
     @Transactional
     public Order createOrder(Long userId, Long addressId, String remark) {
-        // 获取购物车中选中的商品
-        List<Cart> cartItems = cartRepository.findByUserId(userId);
-        List<Cart> selectedItems = cartItems.stream()
-                .filter(item -> item.getIsSelected() == 1)
+        List<Cart> selectedItems = cartRepository.findByUserId(userId).stream()
+                .filter(item -> Integer.valueOf(1).equals(item.getIsSelected()))
                 .toList();
         
         if (selectedItems.isEmpty()) {
-            throw new RuntimeException("购物车中没有选中的商品");
+            throw new BusinessException("CART_EMPTY", "请先选择要兑换的商品");
         }
         
-        // 计算总积分
+        if (addressId == null) {
+            throw new BusinessException("ADDR_REQUIRED", "请选择收货地址后再提交订单");
+        }
+        
+        Address address = addressRepository.findById(addressId)
+                .filter(item -> item.getDeletedAt() == null && userId.equals(item.getUserId()))
+                .orElseThrow(() -> new BusinessException("ADDR_NOT_FOUND", "收货地址无效，请重新选择"));
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "用户不存在"));
+        
         int totalPoints = 0;
         List<OrderItem> orderItems = new ArrayList<>();
         
         for (Cart cartItem : selectedItems) {
-            Product product = productRepository.findById(cartItem.getProductId())
-                    .orElseThrow(() -> new RuntimeException("商品不存在"));
+            int quantity = cartItem.getQuantity() == null ? 0 : cartItem.getQuantity();
             
-            if (product.getStock() < cartItem.getQuantity()) {
-                throw new RuntimeException("商品 " + product.getName() + " 库存不足");
+            Product product = productRepository.findById(cartItem.getProductId())
+                    .filter(item -> item.getDeletedAt() == null && "active".equals(item.getStatus()))
+                    .orElseThrow(() -> new BusinessException("PRODUCT_UNAVAILABLE", "商品已下架，请移除后再提交"));
+            
+            int stock = product.getStock() == null ? 0 : product.getStock();
+            if (stock < quantity) {
+                throw new BusinessException("STOCK_INSUFFICIENT", String.format(
+                        "库存不足：商品「%s」仅剩 %d 件，需要 %d 件", product.getName(), stock, quantity));
             }
             
-            int subtotal = product.getPointsRequired() * cartItem.getQuantity();
+            int subtotal = product.getPointsRequired() * quantity;
             totalPoints += subtotal;
             
             OrderItem orderItem = new OrderItem();
-            orderItem.setOrderId(null); // 稍后设置
             orderItem.setProductId(product.getId());
             orderItem.setProductName(product.getName());
             orderItem.setProductImage(product.getImages());
             orderItem.setPointsRequired(product.getPointsRequired());
-            orderItem.setQuantity(cartItem.getQuantity());
+            orderItem.setQuantity(quantity);
             orderItem.setSubtotalPoints(subtotal);
             
             orderItems.add(orderItem);
         }
         
-        // 检查用户积分
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("用户不存在"));
-        
-        if (user.getPoints() < totalPoints) {
-            throw new RuntimeException("积分不足，当前积分：" + user.getPoints() + "，需要积分：" + totalPoints);
+        int currentPoints = user.getPoints() == null ? 0 : user.getPoints();
+        if (currentPoints < totalPoints) {
+            throw new BusinessException("POINTS_INSUFFICIENT", String.format(
+                    "积分不足：当前 %d，需支付 %d，还差 %d", currentPoints, totalPoints, totalPoints - currentPoints));
         }
         
-        // 获取收货地址
-        Address address = null;
-        if (addressId != null) {
-            address = addressRepository.findById(addressId)
-                    .orElseThrow(() -> new RuntimeException("收货地址不存在"));
-        }
-        
-        // 创建订单
         Order order = new Order();
         order.setUserId(userId);
         order.setAddressId(addressId);
         order.setTotalPoints(totalPoints);
         order.setStatus("pending");
-        order.setRemark(remark);
-        
-        if (address != null) {
-            order.setReceiver(address.getReceiver());
-            order.setReceiverPhone(address.getPhone());
-            order.setReceiverAddress(address.getProvince() + " " + 
-                    address.getCity() + " " + 
-                    address.getDistrict() + " " + 
-                    address.getDetailAddress());
-        }
+        order.setRemark(normalizeRemark(remark));
+        order.setReceiver(address.getReceiver());
+        order.setReceiverPhone(address.getPhone());
+        order.setReceiverAddress(address.getProvince() + " " +
+                address.getCity() + " " +
+                address.getDistrict() + " " +
+                address.getDetailAddress());
         
         order = orderRepository.save(order);
         
-        // 创建订单项
         for (OrderItem item : orderItems) {
             item.setOrderId(order.getId());
             orderItemRepository.save(item);
             
-            // 减少库存
-            Product product = productRepository.findById(item.getProductId()).orElse(null);
-            if (product != null) {
-                product.setStock(product.getStock() - item.getQuantity());
-                product.setSales(product.getSales() + item.getQuantity());
-                productRepository.save(product);
-            }
+            Product product = productRepository.findById(item.getProductId()).orElseThrow();
+            product.setStock(product.getStock() - item.getQuantity());
+            product.setSales((product.getSales() == null ? 0 : product.getSales()) + item.getQuantity());
+            productRepository.save(product);
         }
         
-        // 扣除积分
-        userService.updatePoints(userId, -totalPoints);
+        user.setPoints(currentPoints - totalPoints);
+        userRepository.save(user);
         
-        // 记录积分历史
         PointsHistory pointsHistory = new PointsHistory();
         pointsHistory.setUserId(userId);
         pointsHistory.setPoints(-totalPoints);
@@ -123,10 +117,9 @@ public class OrderService {
         pointsHistory.setDescription("订单消费：" + order.getOrderNo());
         pointsHistory.setRelatedId(order.getId());
         pointsHistory.setRelatedType("order");
-        pointsHistory.setBalanceAfter(user.getPoints() - totalPoints);
+        pointsHistory.setBalanceAfter(user.getPoints());
         pointsHistoryRepository.save(pointsHistory);
         
-        // 清空购物车中已下单的商品
         for (Cart cartItem : selectedItems) {
             cartRepository.delete(cartItem);
         }
@@ -145,45 +138,51 @@ public class OrderService {
     @Transactional
     public Order cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("订单不存在"));
+                .orElseThrow(() -> new BusinessException("ORDER_NOT_FOUND", "订单不存在"));
         
         if (!order.getUserId().equals(userId)) {
-            throw new RuntimeException("无权操作此订单");
+            throw new BusinessException("ORDER_FORBIDDEN", "无权操作此订单");
         }
         
         if (!"pending".equals(order.getStatus())) {
-            throw new RuntimeException("只能取消待处理状态的订单");
+            throw new BusinessException("ORDER_STATUS_INVALID", "当前状态不可取消");
         }
         
-        // 返还积分
-        User user = userRepository.findById(userId).orElse(null);
-        if (user != null) {
-            userService.updatePoints(userId, order.getTotalPoints());
-            
-            // 记录积分历史
-            PointsHistory pointsHistory = new PointsHistory();
-            pointsHistory.setUserId(userId);
-            pointsHistory.setPoints(order.getTotalPoints());
-            pointsHistory.setType("refund");
-            pointsHistory.setDescription("订单取消退款：" + order.getOrderNo());
-            pointsHistory.setRelatedId(order.getId());
-            pointsHistory.setRelatedType("order");
-            pointsHistory.setBalanceAfter(user.getPoints() + order.getTotalPoints());
-            pointsHistoryRepository.save(pointsHistory);
-        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "用户不存在"));
         
-        // 恢复库存
+        user.setPoints((user.getPoints() == null ? 0 : user.getPoints()) + order.getTotalPoints());
+        userRepository.save(user);
+        
+        PointsHistory pointsHistory = new PointsHistory();
+        pointsHistory.setUserId(userId);
+        pointsHistory.setPoints(order.getTotalPoints());
+        pointsHistory.setType("refund");
+        pointsHistory.setDescription("订单取消退款：" + order.getOrderNo());
+        pointsHistory.setRelatedId(order.getId());
+        pointsHistory.setRelatedType("order");
+        pointsHistory.setBalanceAfter(user.getPoints());
+        pointsHistoryRepository.save(pointsHistory);
+        
         List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
         for (OrderItem item : orderItems) {
             Product product = productRepository.findById(item.getProductId()).orElse(null);
             if (product != null) {
-                product.setStock(product.getStock() + item.getQuantity());
-                product.setSales(Math.max(0, product.getSales() - item.getQuantity()));
+                product.setStock((product.getStock() == null ? 0 : product.getStock()) + item.getQuantity());
+                product.setSales(Math.max(0, (product.getSales() == null ? 0 : product.getSales()) - item.getQuantity()));
                 productRepository.save(product);
             }
         }
         
         order.setStatus("cancelled");
         return orderRepository.save(order);
+    }
+
+    private String normalizeRemark(String remark) {
+        if (remark == null) {
+            return null;
+        }
+        String trimmed = remark.trim();
+        return trimmed.length() <= REMARK_MAX_LENGTH ? trimmed : trimmed.substring(0, REMARK_MAX_LENGTH);
     }
 }

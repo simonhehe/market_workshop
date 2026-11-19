@@ -1,6 +1,7 @@
 package com.example.mall.controller;
 
 import com.example.mall.common.ApiResponse;
+import com.example.mall.common.BusinessException;
 import com.example.mall.entity.Order;
 import com.example.mall.entity.OrderItem;
 import com.example.mall.repository.OrderItemRepository;
@@ -36,6 +37,9 @@ public class OrderController {
             
             Order order = orderService.createOrder(userId, addressId, remark);
             return ResponseEntity.ok(ApiResponse.success("订单创建成功", order));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_001", e.getMessage()));
@@ -48,6 +52,9 @@ public class OrderController {
         try {
             List<Order> orders = orderService.getUserOrders(userId);
             return ResponseEntity.ok(ApiResponse.success("获取订单列表成功", orders));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_002", e.getMessage()));
@@ -63,13 +70,13 @@ public class OrderController {
             
             if (orderOpt.isEmpty()) {
                 return ResponseEntity.badRequest()
-                        .body(ApiResponse.error("ORDER_002", "订单不存在"));
+                        .body(ApiResponse.error("ORDER_NOT_FOUND", "订单不存在"));
             }
             
             Order order = orderOpt.get();
             if (!order.getUserId().equals(userId)) {
                 return ResponseEntity.badRequest()
-                        .body(ApiResponse.error("ORDER_002", "无权查看此订单"));
+                        .body(ApiResponse.error("ORDER_FORBIDDEN", "无权查看此订单"));
             }
             
             List<OrderItem> orderItems = orderItemRepository.findByOrderId(id);
@@ -92,6 +99,9 @@ public class OrderController {
         try {
             Order order = orderService.cancelOrder(id, userId);
             return ResponseEntity.ok(ApiResponse.success("订单取消成功", order));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("ORDER_002", e.getMessage()));

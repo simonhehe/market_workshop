@@ -1,6 +1,7 @@
 package com.example.mall.controller;
 
 import com.example.mall.common.ApiResponse;
+import com.example.mall.common.BusinessException;
 import com.example.mall.entity.Cart;
 import com.example.mall.service.CartService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,9 @@ public class CartController {
             result.put("summary", summary);
             
             return ResponseEntity.ok(ApiResponse.success("获取购物车成功", result));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
@@ -48,25 +52,50 @@ public class CartController {
             
             Cart cart = cartService.addToCart(userId, productId, quantity);
             return ResponseEntity.ok(ApiResponse.success("商品已添加到购物车", cart));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
         }
     }
     
+    @PutMapping("/{id}/select")
+    public ResponseEntity<ApiResponse<Cart>> updateSelection(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
+            @RequestBody Map<String, Object> request) {
+        try {
+            Integer isSelected = Integer.valueOf(request.get("isSelected").toString());
+            Cart cart = cartService.selectItem(id, userId, isSelected);
+            return ResponseEntity.ok(ApiResponse.success("购物车勾选状态更新成功", cart));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error("CART_001", e.getMessage()));
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Cart>> updateQuantity(
             @PathVariable Long id,
+            @RequestAttribute("userId") Long userId,
             @RequestBody Map<String, Object> request) {
         try {
             Integer quantity = Integer.valueOf(request.get("quantity").toString());
-            Cart cart = cartService.updateQuantity(id, quantity);
+            Cart cart = cartService.updateQuantity(id, userId, quantity);
             
             if (cart == null) {
                 return ResponseEntity.ok(ApiResponse.success("商品已从购物车移除", null));
             }
             
             return ResponseEntity.ok(ApiResponse.success("购物车商品数量更新成功", cart));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
@@ -74,10 +103,15 @@ public class CartController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> removeFromCart(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> removeFromCart(
+            @PathVariable Long id,
+            @RequestAttribute("userId") Long userId) {
         try {
-            cartService.removeFromCart(id);
+            cartService.removeFromCart(id, userId);
             return ResponseEntity.ok(ApiResponse.success("购物车商品删除成功", null));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
@@ -90,6 +124,9 @@ public class CartController {
         try {
             cartService.clearCart(userId);
             return ResponseEntity.ok(ApiResponse.success("购物车已清空", null));
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(e.getCode(), e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(ApiResponse.error("CART_001", e.getMessage()));
