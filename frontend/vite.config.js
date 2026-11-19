@@ -35,5 +35,9 @@ export default defineConfig({
   preview: {
     port: 3000,
     host: true
+  },
+  test: {
+    environment: 'happy-dom',
+    include: ['tests/**/*.spec.js']
   }
 })
