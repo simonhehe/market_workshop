@@ -21,7 +21,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
            "ORDER BY " +
            "CASE WHEN :sortBy = 'points' THEN p.pointsRequired END ASC, " +
            "CASE WHEN :sortBy = 'sales' THEN p.sales END DESC, " +
-           "CASE WHEN :sortBy = 'time' THEN p.createdAt END DESC")
+           "CASE WHEN :sortBy = 'time' THEN p.createdAt END DESC, " +
+           "p.sort ASC")
     List<Product> searchProducts(@Param("keyword") String keyword, 
                                   @Param("categoryId") Long categoryId,
                                   @Param("sortBy") String sortBy);

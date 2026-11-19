@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/products")
@@ -24,15 +22,12 @@ public class ProductController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String sortBy) {
         
-        List<Product> products;
-        
-        if (categoryId != null) {
-            products = productService.getProductsByCategory(categoryId);
-        } else if (keyword != null || sortBy != null) {
-            products = productService.searchProducts(keyword, null, sortBy);
-        } else {
-            products = productService.getAllProducts();
+        String normalizedKeyword = keyword == null ? null : keyword.trim();
+        if (normalizedKeyword != null && normalizedKeyword.isEmpty()) {
+            normalizedKeyword = null;
         }
+        
+        List<Product> products = productService.searchProducts(normalizedKeyword, categoryId, sortBy);
         
         return ResponseEntity.ok(ApiResponse.success("获取商品列表成功", products));
     }
